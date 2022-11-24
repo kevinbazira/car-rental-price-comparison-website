@@ -28,42 +28,6 @@ public class WebScraper {
         Elements products = htmlDoc.select(cssClasses);
 
         return products;
-
-        //Work through the products
-        /*for(int i=0; i<products.size(); ++i){
-
-            //Get the car image url
-            Elements imageTag = products.get(i).select(".car_image>img");
-            String imageURL = imageTag.attr("src");
-
-            //Get the car rent url
-            Elements rentURLAnchorTag = products.get(i).select(".car_link");
-            String rentURL = rentURLAnchorTag.attr("href");
-
-            //Get the car brand and model
-            String carBrandAndModel = rentURLAnchorTag.text();
-
-            //Get the rent cost per day
-            Elements rentPerDaySpanTag = products.get(i).select(".single_car_price");
-            String rentPerDay = rentPerDaySpanTag.text();
-
-            // rentURL, imageURL, rentPerDay, serviceProvider, carBrandAndModel
-            System.out.println("Brand and Model: " + carBrandAndModel);
-        }*/
-    }
-
-    public static void main(String[] args) {
-        // TODO
-        String searchURL = "https://xcarrental.com/rent-a-car-dubai/?brand=";
-        String brandName = "Lamborghini";
-        String cssClasses = ".element.grid";
-
-        try{
-            System.out.println(scrapeWebsite(searchURL, brandName, cssClasses));
-        }
-        catch(Exception ex){
-            ex.printStackTrace();
-        }
     }
 
 }
