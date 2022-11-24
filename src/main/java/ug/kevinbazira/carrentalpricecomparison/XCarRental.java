@@ -15,7 +15,7 @@ public class XCarRental {
 
     /**
      * Traverses XCarRental website products HTML elements and returns cars data list with
-     * rentURL, imageURL, rentPerDay, serviceProvider, and carBrandAndModel for all cars
+     * rentURL, imageURL, rentPerDay, carBrandAndModel, and serviceProvider for all cars
      * found on search page.
      * @param products web elements with products data
      * @return carsData
@@ -26,24 +26,23 @@ public class XCarRental {
         for(int i=0; i<products.size(); ++i){
             List<String> carData = new ArrayList<>();
 
-            //Get the car rent url
+            // Get the car rent url
             Elements rentURLAnchorTag = products.get(i).select(".car_link");
             String rentURL = rentURLAnchorTag.attr("href");
             carData.add(rentURL);
 
-            //Get the car image url
+            // Get the car image url
             Elements imageTag = products.get(i).select(".car_image>img");
             String imageURL = imageTag.attr("src");
             carData.add(imageURL);
 
-            //Get the rent cost per day
+            // Get the rent cost per day
             Elements rentPerDaySpanTag = products.get(i).select(".single_car_price");
             String rentPerDay = rentPerDaySpanTag.text();
             carData.add(rentPerDay);
 
-            //Get the car brand and model
+            // Get the car brand and model
             String carBrandAndModel = rentURLAnchorTag.text();
-            carData.add(carBrandAndModel);
             carData.add(carBrandAndModel);
 
             // Car service provider

@@ -21,10 +21,10 @@ public class WebScraper {
      */
     public static Elements scrapeWebsite(String searchURL, String brandName, String cssClasses) throws Exception{
 
-        //Download HTML document from website
+        // Download HTML document from website
         Document htmlDoc = Jsoup.connect(searchURL + brandName).get();
 
-        //Get all the products on the page
+        // Get all the products on the page
         Elements products = htmlDoc.select(cssClasses);
 
         return products;
