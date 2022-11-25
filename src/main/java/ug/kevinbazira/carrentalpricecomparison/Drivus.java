@@ -2,9 +2,7 @@ package ug.kevinbazira.carrentalpricecomparison;
 
 import org.jsoup.select.Elements;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,47 +12,6 @@ import java.util.Map;
  * @since 1.0
  */
 public class Drivus {
-
-    /**
-     * Traverses Drivus website products HTML elements and returns cars data list with
-     * rentURL, imageURL, rentPerDay, carBrandAndModel, and serviceProvider for all cars
-     * found on search page.
-     * @param products web elements with products data
-     * @return carsData
-     */
-    public static List<List<String>> DrivusData (Elements products) {
-        List<List<String>> carsData = new ArrayList<>();
-
-        for(int i=0; i<products.size(); ++i){
-            List<String> carData = new ArrayList<>();
-
-            //Get the car rent url
-            Elements rentURLAnchorTag = products.get(i).select(".c-product-panel__title>a");
-            String rentURL = rentURLAnchorTag.attr("href");
-            carData.add(rentURL);
-
-            //Get the car image url
-            Elements imageTag = products.get(i).select(".c-product-panel__img>a>img");
-            String imageURL = imageTag.attr("data-src");
-            carData.add(imageURL);
-
-            //Get the rent cost per day
-            Elements rentPerDayDivTag = products.get(i).select(".c-product-panel__prices>ul :eq(2) .c-product-panel__price");
-            String rentPerDay = rentPerDayDivTag.text().replaceAll("[^0-9.]", "");
-            carData.add(rentPerDay);
-
-            //Get the car brand and model
-            String carBrandAndModel = rentURLAnchorTag.text();
-            carData.add(carBrandAndModel);
-
-            // Car service provider
-            carData.add("Rental Cars UAE");
-
-            // Add car to cars list
-            carsData.add(carData);
-        }
-        return carsData;
-    }
 
     public static void main(String[] args) {
 
@@ -74,13 +31,17 @@ public class Drivus {
                 "catalog_filter%5Bvendors%5D%5B%5D=";
         String brandName = "Hyundai";
         String brandID = String.valueOf(brandNameIDs.get(brandName));
-        String cssClasses = ".c-product-panel.c-product-panel--row";
+        String productCSSClasses = ".c-product-panel.c-product-panel--row";
+        String[] rentURLAnchorTagSelectors = {".c-product-panel__title>a", "href"};
+        String[] imageTagSelectors = {".c-product-panel__img>a>img", "data-src"};
+        String[] rentPerDayTagSelectors = {".c-product-panel__prices>ul :eq(2) .c-product-panel__price", ""};
+        String rentalCarServiceProvider = "DrivusData";
 
         WebScraper DrivusScraper = new WebScraper();
 
         try {
-            Elements products = DrivusScraper.scrapeWebsite(searchURL, brandID, cssClasses);
-            System.out.println("DrivusData: " + DrivusData(products.not(".featured")));
+            Elements products = DrivusScraper.scrapeWebsite(searchURL, brandID, productCSSClasses);
+            System.out.println("DrivusData: " + DrivusScraper.getCarsData(products.not(".featured"), rentURLAnchorTagSelectors, imageTagSelectors, rentPerDayTagSelectors, rentalCarServiceProvider));
         } catch(Exception ex) {
             ex.printStackTrace();
         }
