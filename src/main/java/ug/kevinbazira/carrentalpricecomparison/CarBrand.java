@@ -3,8 +3,8 @@ package ug.kevinbazira.carrentalpricecomparison;
 import javax.persistence.*;
 
 /**
- * Represents the car brand database table.
- * Java annotations map this class to a database table called car_brand_tbl.
+ * Represents a car brand in the database.
+ * Car brand mapped to a database table called car_brand_tbl.
  * @author Kevin Bazira
  * @version 1.0
  * @since 1.0

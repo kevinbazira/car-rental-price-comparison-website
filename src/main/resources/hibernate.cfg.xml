@@ -23,6 +23,7 @@
     
     <!-- Mapping with annotation - specify the annotated classes here -->
     <mapping class="ug.kevinbazira.carrentalpricecomparison.CarBrand"/>
+    <mapping class="ug.kevinbazira.carrentalpricecomparison.CarModel"/>
     
   </session-factory>
 </hibernate-configuration>

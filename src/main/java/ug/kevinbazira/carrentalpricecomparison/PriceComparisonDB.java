@@ -100,4 +100,35 @@ public class PriceComparisonDB {
         System.out.println("Car brand added to database with ID: " + carBrand.getId());
     }
 
+    /**
+     * Adds a new car model to the database
+     */
+    public void addCarModel(){
+
+        // Get a new Session instance from the session factory
+        Session session = sessionFactory.getCurrentSession();
+
+        // Create an instance of a car model
+        CarModel carModel = new CarModel();
+
+        // Set values of a car brand to be added to db tbl
+        carModel.setId(1);
+        carModel.setName("Sport 2023");
+        carModel.setCarBrandID(3);
+        carModel.setImageURL("http://website-domain.com/url-to-image.jpg");
+
+        // Start transaction
+        session.beginTransaction();
+
+        // Add a car model to db session. NB: It will not be stored until the transaction is committed.
+        session.save(carModel);
+
+        // Commit transaction to save it to database
+        session.getTransaction().commit();
+
+        // Close the session and release database connection
+        session.close();
+        System.out.println("Car model added to database with ID: " + carModel.getId());
+    }
+
 }

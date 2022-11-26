@@ -9,8 +9,9 @@ public class Main {
         // Set up the db SessionFactory
         priceComparisonDB.init();
 
-        //Example operations
-        priceComparisonDB.addCarBrand();
+        // Run db transactions
+        // priceComparisonDB.addCarBrand();
+        priceComparisonDB.addCarModel();
         /*DONE*/ //priceComparisonDB.addCereal();//Add data
         /*DONE*/ //priceComparisonDB.updateCereal();//Updates data
         /*DONE*/ //priceComparisonDB.searchCereals();//Search for data
