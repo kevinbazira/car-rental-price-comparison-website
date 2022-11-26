@@ -72,12 +72,34 @@ public class PriceComparisonDB {
     }
 
     /**
-     * Adds a new car brand to the database
+     * Run a database transaction on a database entity.
+     * @dbEntity an object of a database entity e.g CarBrand, CarModel, etc.
      */
-    public void addCarBrand(){
+    public void runDatabaseTransaction(Object dbEntity){
 
         // Get a new Session instance from the session factory
         Session session = sessionFactory.getCurrentSession();
+
+        // Start transaction
+        session.beginTransaction();
+
+        // Add a database entity to the db session. NB: It will not be stored until the transaction is committed.
+        session.save(dbEntity);
+
+        // Commit transaction to save it to database
+        session.getTransaction().commit();
+
+        // Close the session and release database connection
+        session.close();
+
+        // Print success message
+        System.out.println(dbEntity.getClass().getSimpleName() + " database transaction completed successfully!");
+    }
+
+    /**
+     * Adds a new car brand to the database
+     */
+    public void addCarBrand(){
 
         // Create an instance of a car brand
         CarBrand carBrand = new CarBrand();
@@ -86,18 +108,9 @@ public class PriceComparisonDB {
         carBrand.setId(1);
         carBrand.setName("Range Rover");
 
-        // Start transaction
-        session.beginTransaction();
+        // Run database transaction to add car brand to db
+        runDatabaseTransaction(carBrand);
 
-        // Add a car brand to db session. NB: It will not be stored until the transaction is committed.
-        session.save(carBrand);
-
-        // Commit transaction to save it to database
-        session.getTransaction().commit();
-
-        // Close the session and release database connection
-        session.close();
-        System.out.println("Car brand added to database with ID: " + carBrand.getId());
     }
 
     /**
@@ -105,30 +118,34 @@ public class PriceComparisonDB {
      */
     public void addCarModel(){
 
-        // Get a new Session instance from the session factory
-        Session session = sessionFactory.getCurrentSession();
-
         // Create an instance of a car model
         CarModel carModel = new CarModel();
 
         // Set values of a car brand to be added to db tbl
         carModel.setId(1);
-        carModel.setName("Sport 2023");
+        carModel.setName("Sport 2024");
         carModel.setCarBrandID(3);
         carModel.setImageURL("http://website-domain.com/url-to-image.jpg");
 
-        // Start transaction
-        session.beginTransaction();
+        // Run database transaction to add car model to db
+        runDatabaseTransaction(carModel);
+    }
 
-        // Add a car model to db session. NB: It will not be stored until the transaction is committed.
-        session.save(carModel);
+    /**
+     * Adds a new car rental service company to the database
+     */
+    public void addRentalService(){
 
-        // Commit transaction to save it to database
-        session.getTransaction().commit();
+        // Create an instance of a car rental service
+        RentalService rentalService = new RentalService();
 
-        // Close the session and release database connection
-        session.close();
-        System.out.println("Car model added to database with ID: " + carModel.getId());
+        // Set values of a car rental service to be added to db tbl
+        rentalService.setId(1);
+        rentalService.setName("Drivus");
+        rentalService.setWebsite("https://website-domain.com");
+
+        // Run database transaction to add car rental service to db
+        runDatabaseTransaction(rentalService);
     }
 
 }
