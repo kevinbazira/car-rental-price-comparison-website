@@ -25,6 +25,7 @@
     <mapping class="ug.kevinbazira.carrentalpricecomparison.CarBrand"/>
     <mapping class="ug.kevinbazira.carrentalpricecomparison.CarModel"/>
     <mapping class="ug.kevinbazira.carrentalpricecomparison.RentalService"/>
+    <mapping class="ug.kevinbazira.carrentalpricecomparison.CarData"/>
     
   </session-factory>
 </hibernate-configuration>

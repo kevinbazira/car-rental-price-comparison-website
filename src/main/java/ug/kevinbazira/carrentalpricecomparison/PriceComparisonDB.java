@@ -6,6 +6,9 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+
 /**
  * Represents a price comparison database.
  * Specifies the mapping between class objects and their respective tables in a price comparison database.
@@ -146,6 +149,26 @@ public class PriceComparisonDB {
 
         // Run database transaction to add car rental service to db
         runDatabaseTransaction(rentalService);
+    }
+
+    /**
+     * Adds a new car rental service company to the database
+     */
+    public void addCarData(){
+
+        // Create an instance of a car's data
+        CarData carData = new CarData();
+
+        // Set values of a car's data to be added to db tbl
+        carData.setId(1);
+        carData.setCarModelID(1);
+        carData.setRentPerDay(250);
+        carData.setRentalServiceID(1);
+        carData.setRentURL("http://the-rent-url.com/");
+        carData.setDateScraped(Timestamp.from(Instant.now()));
+
+        // Run database transaction to add a car's data to the db
+        runDatabaseTransaction(carData);
     }
 
 }

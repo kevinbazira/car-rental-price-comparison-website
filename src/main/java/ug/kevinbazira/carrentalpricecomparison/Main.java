@@ -12,7 +12,8 @@ public class Main {
         // Run db transactions
         // priceComparisonDB.addCarBrand();
         // priceComparisonDB.addCarModel();
-        priceComparisonDB.addRentalService();
+        // priceComparisonDB.addRentalService();
+        priceComparisonDB.addCarData();
         /*DONE*/ //priceComparisonDB.addCereal();//Add data
         /*DONE*/ //priceComparisonDB.updateCereal();//Updates data
         /*DONE*/ //priceComparisonDB.searchCereals();//Search for data
