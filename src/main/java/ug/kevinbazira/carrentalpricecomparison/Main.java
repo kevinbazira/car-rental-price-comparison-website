@@ -14,10 +14,6 @@ public class Main {
         // priceComparisonDB.addCarModel();
         // priceComparisonDB.addRentalService();
         priceComparisonDB.addCarData();
-        /*DONE*/ //priceComparisonDB.addCereal();//Add data
-        /*DONE*/ //priceComparisonDB.updateCereal();//Updates data
-        /*DONE*/ //priceComparisonDB.searchCereals();//Search for data
-        /*DONE*/ //priceComparisonDB.deleteCerealSafe();//Delete data
 
         // Shut down db SessionFactory
         priceComparisonDB.shutDown();

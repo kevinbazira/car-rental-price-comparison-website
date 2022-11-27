@@ -65,21 +65,21 @@ public class WebScraper {
 
 
     /**
-     * Scrapes given website and returns web elements with products data.
+     * Scrapes given website and returns web elements.
+     * In our case it returns an html element with either car brands or cars list.
      * @param searchURL website search URL
-     * @param brandName brand name of car that we want to scrape
-     * @param productCSSClasses used as product element identifier
-     * @return products
+     * @param elementCSSClasses used as car brand or cars list html elements identifier
+     * @return scraped html elements
      */
-    public static Elements scrapeWebsite(String searchURL, String brandName, String productCSSClasses) throws Exception{
+    public static Elements scrapeWebsite(String searchURL, String elementCSSClasses) throws Exception{
 
         // Download HTML document from website
-        Document htmlDoc = Jsoup.connect(searchURL + brandName).get();
+        Document htmlDoc = Jsoup.connect(searchURL).get();
 
-        // Get all the products on the page
-        Elements products = htmlDoc.select(productCSSClasses);
+        // Get all the elements on the page
+        Elements htmlElements = htmlDoc.select(elementCSSClasses);
 
-        return products;
+        return htmlElements;
     }
 
 }
