@@ -2,7 +2,9 @@ package ug.kevinbazira.carrentalpricecomparison;
 
 import org.jsoup.select.Elements;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,7 +14,6 @@ import java.util.Map;
  * @since 1.0
  */
 public class Drivus {
-
     public static void main(String[] args) {
 
         Map<String, Integer> brandNameIDs = new HashMap<>();
@@ -26,7 +27,7 @@ public class Drivus {
         brandNameIDs.put("MG", 18);
         String brandName = "Hyundai";
         String brandID = String.valueOf(brandNameIDs.get(brandName));
-        String searchURL = "https://www.drivus.ae/catalog/?" +
+        String carsSearchURL = "https://www.drivus.ae/catalog/?" +
                 "catalog_filter%5Bfrom%5D=145&catalog_filter%5Bto%5D=19999&" +
                 "catalog_filter%5Bperiod%5D=monthly&catalog_filter%5Bdate_from%5D=&" +
                 "catalog_filter%5Bdate_to%5D=&catalog_filter%5Bage%5D=1&" +
@@ -39,9 +40,19 @@ public class Drivus {
 
         WebScraper DrivusScraper = new WebScraper();
 
+        /*try {
+            Elements carsHTMLElements = DrivusScraper.scrapeWebsite(carsSearchURL, carElementCSSClasses);
+            System.out.println("Drivus Cars Data: " + DrivusScraper.getCarsData(carsHTMLElements.not(".featured"), rentURLAnchorTagSelectors, imageTagSelectors, rentPerDayTagSelectors, rentalCarServiceProvider));
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }*/
+
+        String brandsSearchURL = "https://www.drivus.ae/catalog/";
+        String brandsElementCSSClasses = ".c-form-filter__brands .c-checkbox-brand__label";
+
         try {
-            Elements carsHTMLElements = DrivusScraper.scrapeWebsite(searchURL, carElementCSSClasses);
-            System.out.println("DrivusData: " + DrivusScraper.getCarsData(carsHTMLElements.not(".featured"), rentURLAnchorTagSelectors, imageTagSelectors, rentPerDayTagSelectors, rentalCarServiceProvider));
+            Elements brandsHTMLElements = DrivusScraper.scrapeWebsite(brandsSearchURL, brandsElementCSSClasses);
+            System.out.println("Drivus Brands Data: " + DrivusScraper.getCarBrands(brandsHTMLElements));
         } catch(Exception ex) {
             ex.printStackTrace();
         }

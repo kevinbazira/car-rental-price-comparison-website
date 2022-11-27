@@ -16,7 +16,24 @@ import java.util.List;
 public class WebScraper {
 
     /**
-     * Traverses website products HTML elements and returns cars data list with
+     * Traverses website brands list of HTML elements and returns car brand names list.
+     * @param brandsHTMLElements web elements with car brands data
+     * @return carBrands
+     */
+    public static List<String> getCarBrands (Elements brandsHTMLElements) {
+
+        List<String> carBrands = new ArrayList<>();
+
+        for(int i=0; i<brandsHTMLElements.size(); ++i){
+            // Get a car brand
+            String carBrandName = brandsHTMLElements.get(i).text();
+            carBrands.add(carBrandName);
+        }
+        return carBrands;
+    }
+
+    /**
+     * Traverses website products listing HTML elements and returns cars data list with
      * rentURL, imageURL, rentPerDay, carBrandAndModel, and serviceProvider for all cars
      * found on search page.
      * @param carsHTMLElements web elements with cars data

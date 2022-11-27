@@ -9,11 +9,10 @@ import org.jsoup.select.Elements;
  * @since 1.0
  */
 public class RentalCarsUAE {
-
     public static void main(String[] args) {
 
         String brandName = "Toyota";
-        String searchURL = "https://rentalcarsuae.com/car-search/?category=all_cars&brandd=" + brandName;
+        String carsSearchURL = "https://rentalcarsuae.com/car-search/?category=all_cars&brandd=" + brandName;
         String carElementCSSClasses = ".carsItem";
         String[] rentURLAnchorTagSelectors = {".carTitle>p>a", "href"};
         String[] imageTagSelectors = {".carImageWrapper>a>img", "nitro-lazy-src"};
@@ -22,9 +21,20 @@ public class RentalCarsUAE {
 
         WebScraper RentalCarsUAEScraper = new WebScraper();
 
+        /*try {
+            Elements carsHTMLElements = RentalCarsUAEScraper.scrapeWebsite(carsSearchURL, carElementCSSClasses);
+            System.out.println("RentalCarsUAE Cars Data: " + RentalCarsUAEScraper.getCarsData(carsHTMLElements, rentURLAnchorTagSelectors, imageTagSelectors, rentPerDayTagSelectors, rentalCarServiceProvider));
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }*/
+
+        String brandsSearchURL = "https://rentalcarsuae.com/car-search/?category=all_cars";
+        String brandsElementCSSClasses = "select[name=\"brandd\"]>option";
+
         try {
-            Elements carsHTMLElements = RentalCarsUAEScraper.scrapeWebsite(searchURL, carElementCSSClasses);
-            System.out.println("RentalCarsUAEData: " + RentalCarsUAEScraper.getCarsData(carsHTMLElements, rentURLAnchorTagSelectors, imageTagSelectors, rentPerDayTagSelectors, rentalCarServiceProvider));
+            Elements brandsHTMLElements = RentalCarsUAEScraper.scrapeWebsite(brandsSearchURL, brandsElementCSSClasses);
+            // Remember to remove "All Brands" from the brands list
+            System.out.println("RentalCarsUAE Brands Data: " + RentalCarsUAEScraper.getCarBrands(brandsHTMLElements));
         } catch(Exception ex) {
             ex.printStackTrace();
         }
