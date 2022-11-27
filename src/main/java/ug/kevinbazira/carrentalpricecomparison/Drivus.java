@@ -40,8 +40,8 @@ public class Drivus {
         WebScraper DrivusScraper = new WebScraper();
 
         try {
-            Elements products = DrivusScraper.scrapeWebsite(searchURL, carElementCSSClasses);
-            System.out.println("DrivusData: " + DrivusScraper.getCarsData(products.not(".featured"), rentURLAnchorTagSelectors, imageTagSelectors, rentPerDayTagSelectors, rentalCarServiceProvider));
+            Elements carsHTMLElements = DrivusScraper.scrapeWebsite(searchURL, carElementCSSClasses);
+            System.out.println("DrivusData: " + DrivusScraper.getCarsData(carsHTMLElements.not(".featured"), rentURLAnchorTagSelectors, imageTagSelectors, rentPerDayTagSelectors, rentalCarServiceProvider));
         } catch(Exception ex) {
             ex.printStackTrace();
         }

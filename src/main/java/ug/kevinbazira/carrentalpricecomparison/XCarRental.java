@@ -73,8 +73,8 @@ public class XCarRental {
         WebScraper XCarRentalScraper = new WebScraper();
 
         try {
-            Elements products = XCarRentalScraper.scrapeWebsite(searchURL, carElementCSSClasses);
-            System.out.println("XCarRentalData: " + XCarRentalScraper.getCarsData(products, rentURLAnchorTagSelectors, imageTagSelectors, rentPerDayTagSelectors, rentalCarServiceProvider));
+            Elements carsHTMLElements = XCarRentalScraper.scrapeWebsite(searchURL, carElementCSSClasses);
+            System.out.println("XCarRentalData: " + XCarRentalScraper.getCarsData(carsHTMLElements, rentURLAnchorTagSelectors, imageTagSelectors, rentPerDayTagSelectors, rentalCarServiceProvider));
         } catch(Exception ex) {
             ex.printStackTrace();
         }

@@ -23,8 +23,8 @@ public class RentalCarsUAE {
         WebScraper RentalCarsUAEScraper = new WebScraper();
 
         try {
-            Elements products = RentalCarsUAEScraper.scrapeWebsite(searchURL, carElementCSSClasses);
-            System.out.println("RentalCarsUAEData: " + RentalCarsUAEScraper.getCarsData(products, rentURLAnchorTagSelectors, imageTagSelectors, rentPerDayTagSelectors, rentalCarServiceProvider));
+            Elements carsHTMLElements = RentalCarsUAEScraper.scrapeWebsite(searchURL, carElementCSSClasses);
+            System.out.println("RentalCarsUAEData: " + RentalCarsUAEScraper.getCarsData(carsHTMLElements, rentURLAnchorTagSelectors, imageTagSelectors, rentPerDayTagSelectors, rentalCarServiceProvider));
         } catch(Exception ex) {
             ex.printStackTrace();
         }

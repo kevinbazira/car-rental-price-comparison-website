@@ -19,34 +19,34 @@ public class WebScraper {
      * Traverses website products HTML elements and returns cars data list with
      * rentURL, imageURL, rentPerDay, carBrandAndModel, and serviceProvider for all cars
      * found on search page.
-     * @param products web elements with products data
+     * @param carsHTMLElements web elements with cars data
      * @param rentURLAnchorTagSelectors css selectors for URL to rent car
      * @param imageTagSelectors css selectors for car image
      * @param rentPerDayTagSelectors css selectors for rent per day
      * @param rentalCarServiceProvider name of car rental service provider
      * @return carsData
      */
-    public static List<List<String>> getCarsData (Elements products, String[] rentURLAnchorTagSelectors,
+    public static List<List<String>> getCarsData (Elements carsHTMLElements, String[] rentURLAnchorTagSelectors,
                                                   String[] imageTagSelectors, String[] rentPerDayTagSelectors,
                                                   String rentalCarServiceProvider) {
 
         List<List<String>> carsData = new ArrayList<>();
 
-        for(int i=0; i<products.size(); ++i){
+        for(int i=0; i<carsHTMLElements.size(); ++i){
             List<String> carData = new ArrayList<>();
 
             // Get the car rent url
-            Elements rentURLAnchorTag = products.get(i).select(rentURLAnchorTagSelectors[0]);
+            Elements rentURLAnchorTag = carsHTMLElements.get(i).select(rentURLAnchorTagSelectors[0]);
             String rentURL = rentURLAnchorTag.attr(rentURLAnchorTagSelectors[1]);
             carData.add(rentURL);
 
             // Get the car image url
-            Elements imageTag = products.get(i).select(imageTagSelectors[0]);
+            Elements imageTag = carsHTMLElements.get(i).select(imageTagSelectors[0]);
             String imageURL = imageTag.attr(imageTagSelectors[1]);
             carData.add(imageURL);
 
             // Get the rent cost per day
-            Elements rentPerDayTag = products.get(i).select(rentPerDayTagSelectors[0]);
+            Elements rentPerDayTag = carsHTMLElements.get(i).select(rentPerDayTagSelectors[0]);
             String rentPerDay = rentPerDayTag.text().replaceAll("[^0-9.]", "");
             carData.add(rentPerDay);
 
