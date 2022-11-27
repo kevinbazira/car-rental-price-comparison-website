@@ -2,9 +2,7 @@ package ug.kevinbazira.carrentalpricecomparison;
 
 import org.jsoup.select.Elements;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,10 +47,11 @@ public class Drivus {
 
         String brandsSearchURL = "https://www.drivus.ae/catalog/";
         String brandsElementCSSClasses = ".c-form-filter__brands .c-checkbox-brand__label";
+        String nonBrandName = "";
 
         try {
             Elements brandsHTMLElements = DrivusScraper.scrapeWebsite(brandsSearchURL, brandsElementCSSClasses);
-            System.out.println("Drivus Brands Data: " + DrivusScraper.getCarBrands(brandsHTMLElements));
+            System.out.println("Drivus Brands Data: " + DrivusScraper.getCarBrands(brandsHTMLElements, nonBrandName));
         } catch(Exception ex) {
             ex.printStackTrace();
         }

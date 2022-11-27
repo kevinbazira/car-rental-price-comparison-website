@@ -31,11 +31,11 @@ public class XCarRental {
 
         String brandsSearchURL = "https://xcarrental.com/rent-a-car-dubai/";
         String brandsElementCSSClasses = "select#brand>option";
+        String nonBrandName = "Any Brand";
 
         try {
             Elements brandsHTMLElements = XCarRentalScraper.scrapeWebsite(brandsSearchURL, brandsElementCSSClasses);
-            // Remember to remove "Any Brand" from the brands list
-            System.out.println("XCarRental Brands Data: " + XCarRentalScraper.getCarBrands(brandsHTMLElements));
+            System.out.println("XCarRental Brands Data: " + XCarRentalScraper.getCarBrands(brandsHTMLElements, nonBrandName));
         } catch(Exception ex) {
             ex.printStackTrace();
         }

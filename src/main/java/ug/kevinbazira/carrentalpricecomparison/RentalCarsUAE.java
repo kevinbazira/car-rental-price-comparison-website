@@ -30,11 +30,11 @@ public class RentalCarsUAE {
 
         String brandsSearchURL = "https://rentalcarsuae.com/car-search/?category=all_cars";
         String brandsElementCSSClasses = "select[name=\"brandd\"]>option";
+        String nonBrandName = "All Brands";
 
         try {
             Elements brandsHTMLElements = RentalCarsUAEScraper.scrapeWebsite(brandsSearchURL, brandsElementCSSClasses);
-            // Remember to remove "All Brands" from the brands list
-            System.out.println("RentalCarsUAE Brands Data: " + RentalCarsUAEScraper.getCarBrands(brandsHTMLElements));
+            System.out.println("RentalCarsUAE Brands Data: " + RentalCarsUAEScraper.getCarBrands(brandsHTMLElements, nonBrandName));
         } catch(Exception ex) {
             ex.printStackTrace();
         }

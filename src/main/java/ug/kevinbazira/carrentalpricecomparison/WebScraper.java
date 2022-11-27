@@ -18,16 +18,19 @@ public class WebScraper {
     /**
      * Traverses website brands list of HTML elements and returns car brand names list.
      * @param brandsHTMLElements web elements with car brands data
+     * @param nonBrandName text to exclude from list of brands
      * @return carBrands
      */
-    public static List<String> getCarBrands (Elements brandsHTMLElements) {
+    public static List<String> getCarBrands (Elements brandsHTMLElements, String nonBrandName) {
 
         List<String> carBrands = new ArrayList<>();
 
-        for(int i=0; i<brandsHTMLElements.size(); ++i){
+        for(int i = 0; i < brandsHTMLElements.size(); ++i){
             // Get a car brand
             String carBrandName = brandsHTMLElements.get(i).text();
-            carBrands.add(carBrandName);
+            if(!carBrandName.equals(nonBrandName)){
+                carBrands.add(carBrandName);
+            }
         }
         return carBrands;
     }
@@ -49,7 +52,7 @@ public class WebScraper {
 
         List<List<String>> carsData = new ArrayList<>();
 
-        for(int i=0; i<carsHTMLElements.size(); ++i){
+        for(int i = 0; i < carsHTMLElements.size(); ++i){
             List<String> carData = new ArrayList<>();
 
             // Get the car rent url
