@@ -165,16 +165,17 @@ public class PriceComparisonDB {
 
     /**
      * Adds a new car rental service company to the database
+     * @params serviceProviderName car rentals service provider's name
+     * @params serviceProviderURL car rentals service provider's website URL
      */
-    public void addRentalService(){
+    public void addRentalService(String serviceProviderName, String serviceProviderURL){
 
         // Create an instance of a car rental service
         RentalService rentalService = new RentalService();
 
         // Set values of a car rental service to be added to db tbl
-        rentalService.setId(1);
-        rentalService.setName("Drivus");
-        rentalService.setWebsite("https://website-domain.com");
+        rentalService.setName(serviceProviderName);
+        rentalService.setWebsite(serviceProviderURL);
 
         // Run database transaction to add car rental service to db
         runDatabaseTransaction(rentalService);

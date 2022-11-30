@@ -20,6 +20,8 @@ public class Main {
 
         // Get XCarRental bean
         WebScraper xCarRental = (WebScraper) context.getBean("XCarRental");
+        // Add car rental service provider to the db
+        priceComparisonDB.addRentalService(xCarRental.getRentalCarServiceProvider(), xCarRental.getBrandsSearchURL());
         // Get scraped car brands from XCarRental website and add them to the db
         List<String> xCarRentalCarBrands = xCarRental.getCarBrands();
         priceComparisonDB.addCarBrands(xCarRentalCarBrands);
