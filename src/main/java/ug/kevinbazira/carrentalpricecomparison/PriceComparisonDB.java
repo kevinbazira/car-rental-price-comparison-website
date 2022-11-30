@@ -100,19 +100,33 @@ public class PriceComparisonDB {
     }
 
     /**
-     * Adds a new car brand to the database
+     * Adds a new car brand name to the database
+     * @param brandName car brand name
      */
-    public void addCarBrand(){
+    public void addCarBrand(String brandName){
 
         // Create an instance of a car brand
         CarBrand carBrand = new CarBrand();
 
         // Set values of a car brand to be added to db tbl
-        carBrand.setId(1);
-        carBrand.setName("Range Rover");
+        // ID column autopopulates so no need to set it
+        carBrand.setName(brandName);
 
         // Run database transaction to add car brand to db
         runDatabaseTransaction(carBrand);
+
+    }
+
+    /**
+     * Loops through a list of car brands and adds each brand to the database
+     * @param brandNames car brand name
+     */
+    public void addCarBrands(String[] brandNames){
+
+        for(int i = 0; i < brandNames.length; i++){
+            // add a brand name to the db
+            addCarBrand(brandNames[i]);
+        }
 
     }
 
