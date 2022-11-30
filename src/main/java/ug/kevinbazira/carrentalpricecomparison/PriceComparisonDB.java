@@ -5,9 +5,11 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.exception.ConstraintViolationException;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
 
 /**
  * Represents a price comparison database.
@@ -80,23 +82,36 @@ public class PriceComparisonDB {
      */
     public void runDatabaseTransaction(Object dbEntity){
 
+        // Database entity name
+        String dbEntityName = dbEntity.getClass().getSimpleName();
+
         // Get a new Session instance from the session factory
         Session session = sessionFactory.getCurrentSession();
 
         // Start transaction
         session.beginTransaction();
 
-        // Add a database entity to the db session. NB: It will not be stored until the transaction is committed.
-        session.save(dbEntity);
+        // handle unique key constraint exceptions
+        try{
 
-        // Commit transaction to save it to database
-        session.getTransaction().commit();
+            // Add a database entity to the db session. NB: It will not be stored until the transaction is committed.
+            session.save(dbEntity);
+
+            // Commit transaction to save it to database
+            session.getTransaction().commit();
+
+            // Print success message
+            System.out.println(dbEntityName + " database entry completed successfully!");
+
+        } catch(ConstraintViolationException ex) {
+            System.err.println("Saving failed! Duplicate " + dbEntityName + " entry to database is not allowed.");
+            ex.printStackTrace();
+        } finally {
+            System.out.println("Proceeding to close session because a unique constraint on " + dbEntityName + " does not allow duplicate entries to the database.");
+        }
 
         // Close the session and release database connection
         session.close();
-
-        // Print success message
-        System.out.println(dbEntity.getClass().getSimpleName() + " database transaction completed successfully!");
     }
 
     /**
@@ -121,11 +136,11 @@ public class PriceComparisonDB {
      * Loops through a list of car brands and adds each brand to the database
      * @param brandNames car brand name
      */
-    public void addCarBrands(String[] brandNames){
+    public void addCarBrands(List<String> brandNames){
 
-        for(int i = 0; i < brandNames.length; i++){
+        for(int i = 0; i < brandNames.size(); i++){
             // add a brand name to the db
-            addCarBrand(brandNames[i]);
+            addCarBrand(brandNames.get(i));
         }
 
     }
