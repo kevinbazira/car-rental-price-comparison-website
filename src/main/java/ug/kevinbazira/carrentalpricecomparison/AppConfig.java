@@ -29,10 +29,9 @@ public class AppConfig {
         tmpXCarRental.setNonBrandName("Any Brand");
 
         // configure properties to scrape car hire details
-        tmpXCarRental.setBrandName("Lamborghini");
         tmpXCarRental.setCarsSearchURL("https://xcarrental.com/rent-a-car-dubai/?brand=");
         tmpXCarRental.setCarElementCSSClasses(".element.grid");
-        tmpXCarRental.setRentURLAnchorTagSelectors(new String[]{".car_image>img", "src"});
+        tmpXCarRental.setRentURLAnchorTagSelectors(new String[]{".car_link", "href"});
         tmpXCarRental.setImageTagSelectors(new String[]{".car_image>img", "src"});
         tmpXCarRental.setRentPerDayTagSelectors(new String[]{".single_car_price", ""});
         tmpXCarRental.setRentalCarServiceProvider("X Car Rental");

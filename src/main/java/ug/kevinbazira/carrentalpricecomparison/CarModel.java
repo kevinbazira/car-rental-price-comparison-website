@@ -21,8 +21,9 @@ public class CarModel {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "car_brand_id")
-    private int carBrandID;
+    @ManyToOne // neat trick to map foreign key :)
+    @JoinColumn(name = "car_brand_id")
+    private CarBrand carBrand;
 
     @Column(name = "image_url")
     private String imageURL;
@@ -49,12 +50,12 @@ public class CarModel {
         this.name = name;
     }
 
-    public int getCarBrandID() {
-        return carBrandID;
+    public CarBrand getCarBrand() {
+        return carBrand;
     }
 
-    public void setCarBrandID(int carBrandID) {
-        this.carBrandID = carBrandID;
+    public void setCarBrand(CarBrand carBrand) {
+        this.carBrand = carBrand;
     }
 
     public String getImageURL() {
@@ -72,7 +73,7 @@ public class CarModel {
         return "CarModel{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", carBrandID=" + carBrandID +
+                ", carBrand=" + carBrand +
                 ", imageURL='" + imageURL + '\'' +
                 '}';
     }

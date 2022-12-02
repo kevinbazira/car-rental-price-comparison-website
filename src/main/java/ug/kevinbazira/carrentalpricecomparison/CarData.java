@@ -19,14 +19,16 @@ public class CarData {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "car_model_id")
-    private int carModelID;
+    @ManyToOne // neat trick to map foreign key :)
+    @JoinColumn(name = "car_model_id")
+    private CarModel carModel;
 
     @Column(name = "rent_per_day")
     private float rentPerDay;
 
-    @Column(name = "rental_service_id")
-    private int rentalServiceID;
+    @ManyToOne // neat trick to map foreign key :)
+    @JoinColumn(name = "rental_service_id")
+    private RentalService rentalService;
 
     @Column(name = "rent_url")
     private String rentURL;
@@ -48,12 +50,12 @@ public class CarData {
         this.id = id;
     }
 
-    public int getCarModelID() {
-        return carModelID;
+    public CarModel getCarModel() {
+        return carModel;
     }
 
-    public void setCarModelID(int carModelID) {
-        this.carModelID = carModelID;
+    public void setCarModel(CarModel carModel) {
+        this.carModel = carModel;
     }
 
     public float getRentPerDay() {
@@ -64,12 +66,12 @@ public class CarData {
         this.rentPerDay = rentPerDay;
     }
 
-    public int getRentalServiceID() {
-        return rentalServiceID;
+    public RentalService getRentalService() {
+        return rentalService;
     }
 
-    public void setRentalServiceID(int rentalServiceID) {
-        this.rentalServiceID = rentalServiceID;
+    public void setRentalService(RentalService rentalService) {
+        this.rentalService = rentalService;
     }
 
     public String getRentURL() {
@@ -94,9 +96,9 @@ public class CarData {
     public String toString() {
         return "CarData{" +
                 "id=" + id +
-                ", carModelID=" + carModelID +
+                ", carModel=" + carModel +
                 ", rentPerDay=" + rentPerDay +
-                ", rentalServiceID=" + rentalServiceID +
+                ", rentalService=" + rentalService +
                 ", rentURL='" + rentURL + '\'' +
                 ", dateScraped=" + dateScraped +
                 '}';

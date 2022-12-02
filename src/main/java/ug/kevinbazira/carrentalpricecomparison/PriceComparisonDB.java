@@ -6,6 +6,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.query.Query;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -91,7 +92,7 @@ public class PriceComparisonDB {
         // Start transaction
         session.beginTransaction();
 
-        // handle unique key constraint exceptions
+        // Handle unique key constraint exceptions
         try{
 
             // Add a database entity to the db session. NB: It will not be stored until the transaction is committed.
@@ -104,14 +105,32 @@ public class PriceComparisonDB {
             System.out.println(dbEntityName + " database entry completed successfully!");
 
         } catch(ConstraintViolationException ex) {
-            System.err.println("Saving failed! Duplicate " + dbEntityName + " entry to database is not allowed.");
+            System.err.println("Saving " + dbEntityName + " failed! :(");
             ex.printStackTrace();
         } finally {
-            System.out.println("Proceeding to close session because a unique constraint on " + dbEntityName + " does not allow duplicate entries to the database.");
+            System.out.println("Closing " + dbEntityName + " database session");
         }
 
         // Close the session and release database connection
         session.close();
+    }
+
+    /**
+     * Get a car brand details from the database based on the name.
+     * @param brandName car brand name
+     * @return carBrand
+     */
+    public CarBrand getCarBrand(String brandName){
+
+        Session session = sessionFactory.getCurrentSession();
+        session.beginTransaction();
+        Query query = session.createQuery("from CarBrand where name=:name");
+        query.setParameter("name", brandName);
+        CarBrand carBrand = (CarBrand) query.uniqueResult();
+        session.close();
+
+        return carBrand;
+
     }
 
     /**
@@ -146,27 +165,65 @@ public class PriceComparisonDB {
     }
 
     /**
-     * Adds a new car model to the database
+     * Get a car model's details from the database based on the name.
+     * @param modelName car model name
+     * @return carModel
      */
-    public void addCarModel(){
+    public CarModel getCarModel(String modelName){
+
+        Session session = sessionFactory.getCurrentSession();
+        session.beginTransaction();
+        Query query = session.createQuery("from CarModel where name=:name");
+        query.setParameter("name", modelName);
+        CarModel carModel = (CarModel) query.uniqueResult();
+        session.close();
+
+        return carModel;
+
+    }
+
+    /**
+     * Adds a new car model to the database
+     * @param modelName car model name
+     * @param carBrand car model brand
+     * @param carImageURL car model image URL
+     */
+    public void addCarModel(String modelName, CarBrand carBrand, String carImageURL){
 
         // Create an instance of a car model
         CarModel carModel = new CarModel();
 
         // Set values of a car brand to be added to db tbl
-        carModel.setId(1);
-        carModel.setName("Sport 2024");
-        carModel.setCarBrandID(3);
-        carModel.setImageURL("http://website-domain.com/url-to-image.jpg");
+        carModel.setName(modelName);
+        carModel.setCarBrand(carBrand);
+        carModel.setImageURL(carImageURL);
 
         // Run database transaction to add car model to db
         runDatabaseTransaction(carModel);
     }
 
     /**
+     * Get a car rental service provider's details from the database based on the name.
+     * @param rentalServiceProviderName car rental service provider name
+     * @return rentalService
+     */
+    public RentalService getRentalService(String rentalServiceProviderName){
+
+        Session session = sessionFactory.getCurrentSession();
+        session.beginTransaction();
+        Query query = session.createQuery("from RentalService where name=:name");
+        query.setParameter("name", rentalServiceProviderName);
+        RentalService rentalService = (RentalService) query.uniqueResult();
+        session.close();
+
+        return rentalService;
+
+    }
+
+    /**
      * Adds a new car rental service company to the database
-     * @params serviceProviderName car rentals service provider's name
-     * @params serviceProviderURL car rentals service provider's website URL
+     * @param serviceProviderName car rentals service provider's name
+     * @param serviceProviderURL car rentals service provider's website URL
      */
     public void addRentalService(String serviceProviderName, String serviceProviderURL){
 
@@ -183,18 +240,21 @@ public class PriceComparisonDB {
 
     /**
      * Adds a new car rental service company to the database
+     * @param carModel car model object with name and id but id is what will be added to db
+     * @param rentPerDay car rent per day
+     * @param rentalService car rental service provider object with name and id but id is what will be added to db
+     * @param rentURL car rent URL
      */
-    public void addCarData(){
+    public void addCarData(CarModel carModel, int rentPerDay, RentalService rentalService, String rentURL){
 
         // Create an instance of a car's data
         CarData carData = new CarData();
 
         // Set values of a car's data to be added to db tbl
-        carData.setId(1);
-        carData.setCarModelID(1);
-        carData.setRentPerDay(250);
-        carData.setRentalServiceID(1);
-        carData.setRentURL("http://the-rent-url.com/");
+        carData.setCarModel(carModel);
+        carData.setRentPerDay(rentPerDay);
+        carData.setRentalService(rentalService);
+        carData.setRentURL(rentURL);
         carData.setDateScraped(Timestamp.from(Instant.now()));
 
         // Run database transaction to add a car's data to the db

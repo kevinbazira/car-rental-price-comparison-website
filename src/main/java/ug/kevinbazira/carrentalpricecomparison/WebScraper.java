@@ -21,7 +21,6 @@ public class WebScraper {
     private String nonBrandName;
 
     // properties used to scrape car hire details
-    private String brandName;
     private String carsSearchURL;
     private String carElementCSSClasses;
     private String[] rentURLAnchorTagSelectors;
@@ -57,14 +56,6 @@ public class WebScraper {
 
     public void setNonBrandName(String nonBrandName) {
         this.nonBrandName = nonBrandName;
-    }
-
-    public String getBrandName() {
-        return brandName;
-    }
-
-    public void setBrandName(String brandName) {
-        this.brandName = brandName;
     }
 
     public String getCarsSearchURL() {
@@ -177,12 +168,16 @@ public class WebScraper {
      * Traverses website products listing HTML elements and returns car hire data list with
      * rentURL, imageURL, rentPerDay, carBrandAndModel, and serviceProvider for all cars
      * found on search page.
+     * @params brandName
      * @return carsData
      */
-    public List<List<String>> getCarsData () {
+    public List<List<String>> getCarsData (String brandName) {
+
+        // append car brand to search URL
+        String brandCarsSearchURL = carsSearchURL+brandName;
 
         // scraped cars for hire in HTML elements
-        Elements carsHTMLElements = scrapeCarsHTMLElements(carsSearchURL+brandName, carElementCSSClasses);
+        Elements carsHTMLElements = scrapeCarsHTMLElements(brandCarsSearchURL, carElementCSSClasses);
 
         List<List<String>> carsData = new ArrayList<>();
 
@@ -218,11 +213,35 @@ public class WebScraper {
     }
 
     /**
+     * Extracts model name from a string that has both brand and model name.
+     * @params brandAndModelName string that contains both brand and model name
+     * @params brandName car brand name
+     * @return modelName
+     */
+    public String extractModelName (String brandAndModelName, String brandName) {
+
+        String modelName = "";
+        // Only extract model name if brand and model name contains brand name
+        if(brandAndModelName.contains(brandName)){
+            // Split the brand and model name
+            String[] brandAndModelNames = brandAndModelName.split(" ");
+            // Iterate through brand and model names to keep only model name
+            for (String name : brandAndModelNames) {
+                if (!name.equals(brandName)) {
+                    modelName += name + " ";
+                }
+            }
+        }
+
+        return modelName;
+    }
+
+    /**
      * Scrapes given website and returns web elements.
      * In our case it returns an html element with either car brands or cars list.
      * @param searchURL website search URL
      * @param elementCSSClasses used as car brand or cars list html elements identifier
-     * @return scraped html elements
+     * @return htmlElements scraped html elements
      */
     public Elements scrapeWebsite(String searchURL, String elementCSSClasses) throws Exception{
 
