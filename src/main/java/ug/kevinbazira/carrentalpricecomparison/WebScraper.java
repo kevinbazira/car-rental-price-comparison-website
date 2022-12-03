@@ -6,6 +6,7 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a web scraper.
@@ -19,6 +20,7 @@ public class WebScraper {
     private String brandsSearchURL;
     private String brandsElementCSSClasses;
     private String nonBrandName;
+    private Map<String, Integer> brandNameIDs;
 
     // properties used to scrape car hire details
     private String carsSearchURL;
@@ -56,6 +58,14 @@ public class WebScraper {
 
     public void setNonBrandName(String nonBrandName) {
         this.nonBrandName = nonBrandName;
+    }
+
+    public Map<String, Integer> getBrandNameIDs() {
+        return brandNameIDs;
+    }
+
+    public void setBrandNameIDs(Map<String, Integer> brandNameIDs) {
+        this.brandNameIDs = brandNameIDs;
     }
 
     public String getCarsSearchURL() {
@@ -221,13 +231,15 @@ public class WebScraper {
     public String extractModelName (String brandAndModelName, String brandName) {
 
         String modelName = "";
+        // case-insensitive way of checking whether brand and model name contains brand name
+        boolean brandAndModelNameContainsBrandName = brandAndModelName.matches(".*(?i)"+ brandName +".*");
         // Only extract model name if brand and model name contains brand name
-        if(brandAndModelName.contains(brandName)){
+        if(brandAndModelNameContainsBrandName){
             // Split the brand and model name
             String[] brandAndModelNames = brandAndModelName.split(" ");
             // Iterate through brand and model names to keep only model name
             for (String name : brandAndModelNames) {
-                if (!name.equals(brandName)) {
+                if (!name.equalsIgnoreCase(brandName)) {
                     modelName += name + " ";
                 }
             }

@@ -96,7 +96,7 @@ public class PriceComparisonDB {
         try{
 
             // Add a database entity to the db session. NB: It will not be stored until the transaction is committed.
-            session.save(dbEntity);
+            session.saveOrUpdate(dbEntity);
 
             // Commit transaction to save it to database
             session.getTransaction().commit();

@@ -3,10 +3,12 @@ package ug.kevinbazira.carrentalpricecomparison;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
- * TODO
+ * Main class for this web scraper program.
+ * It's mainly used to glue everything together from: scraping the websites; to transforming data; and loading it into the database.
  * @author Kevin Bazira
  * @version 1.0
  * @since 1.0
@@ -14,11 +16,45 @@ import java.util.List;
 public class Main {
 
     /**
+     * Extract/Scrape Transform Load (ETL).
+     * This method glues everything together:
+     * 1. Calls the scraper that extracts car hire details from a website.
+     * 2. Calls methods that transform scraped data into details (like car brand, model, service provider, rent per day, etc) that can be added to the db.
+     * 3. Calls the load methods that add transformed car hire details to their respective database entities.
+     * @param webScraper web scraper object of given website
+     * @param priceComparisonDB object used to manipulate data in price comparison database
+     */
+    public static void etl(WebScraper webScraper, PriceComparisonDB priceComparisonDB){
+        // Add car rental service provider to the db
+        priceComparisonDB.addRentalService(webScraper.getRentalCarServiceProvider(), webScraper.getBrandsSearchURL());
+        // Get scraped car brands from given website and add them to the db
+        List<String> rentalCarBrands = webScraper.getCarBrands();
+        // Add car brands to db
+        priceComparisonDB.addCarBrands(rentalCarBrands);
+        /*
+        Loop through each car brand, get scraped car data and
+        use it to add the car model + car hire details to the db.
+         */
+        for(int i = 0; i < rentalCarBrands.size(); i++){
+            // Get brand name.
+            String brandName = rentalCarBrands.get(i);
+            // Get scraped car hire details from a given website. NB: the Drivus website uses brand IDs for search.
+            String searchBrandName = webScraper.getRentalCarServiceProvider().equals("Drivus") ? String.valueOf(webScraper.getBrandNameIDs().get(rentalCarBrands.get(i))) : brandName;
+            List<List<String>> rentalCarsData = webScraper.getCarsData(searchBrandName);
+            // Add car model details to database
+            addCarModelDetailsToDB(brandName, rentalCarsData, webScraper, priceComparisonDB);
+            // Add car hire details to database
+            addCarHireDetailsToDB(brandName, rentalCarsData, webScraper, priceComparisonDB);
+        }
+
+    }
+
+    /**
      * Add car hire details to the database.
      * @param brandName car brand name
      * @param carsData list of cars and their car hire details
      * @param webScraper web scraper object of given website
-     * @param priceComparisonDB object used manipulate data in price comparison database
+     * @param priceComparisonDB object used to manipulate data in price comparison database
      */
     public static void addCarHireDetailsToDB(String brandName, List<List<String>> carsData,WebScraper webScraper, PriceComparisonDB priceComparisonDB){
         // Loop through each car's hire details and add the car model to the db
@@ -47,7 +83,7 @@ public class Main {
      * @param brandName car brand name
      * @param carsData list of cars and their car hire details
      * @param webScraper web scraper object of given website
-     * @param priceComparisonDB object used manipulate data in price comparison database
+     * @param priceComparisonDB object used to manipulate data in price comparison database
      */
     public static void addCarModelDetailsToDB(String brandName, List<List<String>> carsData,WebScraper webScraper, PriceComparisonDB priceComparisonDB){
         // Loop through each car's hire details and add the car model to the db
@@ -84,16 +120,51 @@ public class Main {
 
         // Get XCarRental bean
         WebScraper xCarRental = (WebScraper) context.getBean("XCarRental");
-        // Add car rental service provider to the db
+        // Extract/scrape data from the XCarRental Website, transform it, and load/add it to the db.
+        etl(xCarRental, priceComparisonDB);
+
+        // Get RentalCarsUAE bean
+        WebScraper rentalCarsUAE = (WebScraper) context.getBean("RentalCarsUAE");
+        // Extract/scrape data from the RentalCarsUAE Website, transform it, and load/add it to the db.
+        etl(rentalCarsUAE, priceComparisonDB);
+
+        // Get Drivus bean
+        WebScraper drivus = (WebScraper) context.getBean("Drivus");
+        // Extract/scrape data from the Drivus Website, transform it, and load/add it to the db.
+        etl(drivus, priceComparisonDB);
+        /*String brandName = "KIA";
+        // List<String> drivusCarBrands = drivus.getCarBrands();
+        List<List<String>> drivusCarsData = drivus.getCarsData(String.valueOf(drivus.getBrandNameIDs().get(brandName)));
+        for(int i = 0; i < drivusCarsData.size(); i++){
+            List<String> carData = drivusCarsData.get(i);
+            // Get model image URL
+            String carModelImageURL = carData.get(1);
+            // Get brand and model name
+            String brandAndModelName = carData.get(3);
+            // Extract model name from brand and model name
+            String modelName = drivus.extractModelName(brandAndModelName, brandName);
+            // Only add model name to db if it's connected to the brand
+            if(!modelName.isEmpty()){
+                // Get model's car brand object from db. Its ID is to be used as a foreign key.
+                CarBrand modelCarBrandObj = priceComparisonDB.getCarBrand(brandName);
+                // Add car model details to the db
+                System.out.println("BrandID: " + modelCarBrandObj.getId());
+            }
+        }*/
+        // Get scraped car hire details from XCarRental website
+        // List<List<String>> drivusCarsData = drivus.getCarsData(String.valueOf(drivus.getBrandNameIDs().get(brandName)));
+        // System.out.println(drivusCarBrands);
+
+
+
+        /*** Add car rental service provider to the db
         priceComparisonDB.addRentalService(xCarRental.getRentalCarServiceProvider(), xCarRental.getBrandsSearchURL());
         // Get scraped car brands from XCarRental website and add them to the db
         List<String> xCarRentalCarBrands = xCarRental.getCarBrands();
         // Add car brands to db
         priceComparisonDB.addCarBrands(xCarRentalCarBrands);
-        /*
-        Loop through each car brand, get scraped car data and
-        use it to add the car model + car hire details to the db.
-         */
+        // Loop through each car brand, get scraped car data and
+        // use it to add the car model + car hire details to the db.
         for(int i = 0; i < xCarRentalCarBrands.size(); i++){
             String brandName = xCarRentalCarBrands.get(i);
             // Get scraped car hire details from XCarRental website
@@ -103,7 +174,7 @@ public class Main {
             // Add car hire details to database
             addCarHireDetailsToDB(brandName, xCarRentalCarsData, xCarRental, priceComparisonDB);
         }
-
+        */
 
 
         /*// Add car model details to database
