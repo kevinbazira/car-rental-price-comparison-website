@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Main class for this web scraper program.
- * It's mainly used to glue everything together from: scraping the websites; to transforming data; and loading it into the database.
+ * It's mainly :D used to glue everything together from: scraping the websites; to transforming data; and loading it into the database.
  * @author Kevin Bazira
  * @version 1.0
  * @since 1.0
@@ -38,8 +38,15 @@ public class Main {
         for(int i = 0; i < rentalCarBrands.size(); i++){
             // Get brand name.
             String brandName = rentalCarBrands.get(i);
-            // Get scraped car hire details from a given website. NB: The Drivus website displays brand names but uses brand IDs for search..
-            String searchBrandName = webScraper.getRentalCarServiceProvider().equals("Drivus") ? String.valueOf(webScraper.getBrandNameIDs().get(rentalCarBrands.get(i))) : brandName;
+            // Get scraped car hire details from a given website. NB: The Drivus website displays brand names but uses brand IDs for search. The Quick Drive website requires hyphens in brands for search.
+            String searchBrandName = "";
+            if(webScraper.getRentalCarServiceProvider().equals("Drivus")){
+                searchBrandName = String.valueOf(webScraper.getBrandNameIDs().get(brandName));
+            } else if (webScraper.getRentalCarServiceProvider().equals("Quick Drive")){
+                searchBrandName = brandName.replace(" ", "-");
+            } else {
+                searchBrandName = brandName;
+            }
             List<List<String>> rentalCarsData = webScraper.getCarsData(searchBrandName);
             // Add car model details to database
             addCarModelDetailsToDB(brandName, rentalCarsData, webScraper, priceComparisonDB);
@@ -104,6 +111,16 @@ public class Main {
             }
         }
     }
+
+    /**
+     * Main method that is running ETLs on the following websites:
+     * 1. XCarRental
+     * 2. RentalCarsUAE
+     * 3. Drivus
+     * 4. PhantomRentCar
+     * 5. QuickDrive
+     * @param args
+     */
     public static void main(String[] args) {
 
         // Start program timer
@@ -132,12 +149,21 @@ public class Main {
         WebScraper drivus = (WebScraper) context.getBean("Drivus");
         // Extract/scrape data from the Drivus Website, transform it, and load/add it to the db.
         etl(drivus, priceComparisonDB);
-        */
 
         // Get PhantomRentCar bean
         WebScraper phantomRentCar = (WebScraper) context.getBean("PhantomRentCar");
         // Extract/scrape data from the PhantomRentCar Website, transform it, and load/add it to the db.
         etl(phantomRentCar, priceComparisonDB);
+
+        // Get QuickDrive bean
+        WebScraper quickDrive = (WebScraper) context.getBean("QuickDrive");
+        // Extract/scrape data from the QuickDrive Website, transform it, and load/add it to the db.
+        etl(quickDrive, priceComparisonDB);
+        */
+
+        // List<String> quickDriveCarBrands = quickDrive.getCarBrands(); // PASSED!!!
+        // List<List<String>> quickDriveCarsData = quickDrive.getCarsData("Rolls-Royce");
+        // System.out.println("quickDriveCarsData: " + quickDriveCarsData);
 
 
         // List<String> phantomRentCarCarBrands = phantomRentCar.getCarBrands(); // PASSED!!!

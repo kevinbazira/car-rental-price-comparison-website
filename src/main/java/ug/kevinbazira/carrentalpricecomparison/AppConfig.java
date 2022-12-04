@@ -139,5 +139,32 @@ public class AppConfig {
 
     }
 
+    /**
+     * Dependency injection for properties that will be used to scrape
+     * cars for hire from the QuickDrive website.
+     */
+    @Bean
+    public WebScraper QuickDrive(){
+
+        WebScraper tmpQuickDrive = new WebScraper();
+
+        // configure properties to scrape rental car brands
+        tmpQuickDrive.setBrandsSearchURL("https://quickdrive.ae/fleet");
+        tmpQuickDrive.setBrandsElementCSSClasses(".product-card .my-ul>.checkbox>label");
+        tmpQuickDrive.setNonBrandName("Car Brand");
+
+        // configure properties to scrape car hire details
+        tmpQuickDrive.setCarsSearchURL("https://quickdrive.ae/fleet?group=");
+        tmpQuickDrive.setCarElementCSSClasses("#loadMoreData>.thumbnail-car-card");
+        tmpQuickDrive.setRentURLAnchorTagSelectors(new String[]{".media>a", "href"});
+        tmpQuickDrive.setImageTagSelectors(new String[]{".media>a>img", "src"});
+        tmpQuickDrive.setRentPerDayTagSelectors(new String[]{".caption>div>.col-md-5>div>strong", ""});
+        tmpQuickDrive.setCarBrandAndModelSelectors(new String[]{".caption>div>div>h4>a", ""});
+        tmpQuickDrive.setRentalCarServiceProvider("Quick Drive");
+
+        return tmpQuickDrive;
+
+    }
+
 
 }
