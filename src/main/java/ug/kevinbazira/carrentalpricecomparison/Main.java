@@ -38,7 +38,7 @@ public class Main {
         for(int i = 0; i < rentalCarBrands.size(); i++){
             // Get brand name.
             String brandName = rentalCarBrands.get(i);
-            // Get scraped car hire details from a given website. NB: the Drivus website uses brand IDs for search.
+            // Get scraped car hire details from a given website. NB: The Drivus website displays brand names but uses brand IDs for search..
             String searchBrandName = webScraper.getRentalCarServiceProvider().equals("Drivus") ? String.valueOf(webScraper.getBrandNameIDs().get(rentalCarBrands.get(i))) : brandName;
             List<List<String>> rentalCarsData = webScraper.getCarsData(searchBrandName);
             // Add car model details to database
@@ -118,7 +118,7 @@ public class Main {
         // Instruct Spring to create and wire beans using annotations.
         ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
 
-        // Get XCarRental bean
+        /*** Get XCarRental bean
         WebScraper xCarRental = (WebScraper) context.getBean("XCarRental");
         // Extract/scrape data from the XCarRental Website, transform it, and load/add it to the db.
         etl(xCarRental, priceComparisonDB);
@@ -132,6 +132,18 @@ public class Main {
         WebScraper drivus = (WebScraper) context.getBean("Drivus");
         // Extract/scrape data from the Drivus Website, transform it, and load/add it to the db.
         etl(drivus, priceComparisonDB);
+        */
+
+        // Get PhantomRentCar bean
+        WebScraper phantomRentCar = (WebScraper) context.getBean("PhantomRentCar");
+        // Extract/scrape data from the PhantomRentCar Website, transform it, and load/add it to the db.
+        etl(phantomRentCar, priceComparisonDB);
+
+
+        // List<String> phantomRentCarCarBrands = phantomRentCar.getCarBrands(); // PASSED!!!
+        // List<List<String>> phantomRentCarCarsData = phantomRentCar.getCarsData("Range Rover");
+        // System.out.println("phantomRentCarCarsData: " + phantomRentCarCarsData);
+
         /*String brandName = "KIA";
         // List<String> drivusCarBrands = drivus.getCarBrands();
         List<List<String>> drivusCarsData = drivus.getCarsData(String.valueOf(drivus.getBrandNameIDs().get(brandName)));

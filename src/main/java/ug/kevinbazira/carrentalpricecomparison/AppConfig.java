@@ -5,6 +5,12 @@ import org.springframework.context.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Represents website configurations for web elements to be scraped.
+ * @author Kevin Bazira
+ * @version 1.0
+ * @since 1.0
+ */
 @Configuration
 public class AppConfig {
 
@@ -28,6 +34,7 @@ public class AppConfig {
         tmpXCarRental.setRentURLAnchorTagSelectors(new String[]{".car_link", "href"});
         tmpXCarRental.setImageTagSelectors(new String[]{".car_image>img", "src"});
         tmpXCarRental.setRentPerDayTagSelectors(new String[]{".single_car_price", ""});
+        tmpXCarRental.setCarBrandAndModelSelectors(new String[]{".car_link", ""});
         tmpXCarRental.setRentalCarServiceProvider("X Car Rental");
 
         return tmpXCarRental;
@@ -54,6 +61,7 @@ public class AppConfig {
         tmpRentalCarsUAE.setRentURLAnchorTagSelectors(new String[]{".carTitle>p>a", "href"});
         tmpRentalCarsUAE.setImageTagSelectors(new String[]{".carImageWrapper>a>img", "src"});
         tmpRentalCarsUAE.setRentPerDayTagSelectors(new String[]{".special_price :eq(1)", ""});
+        tmpRentalCarsUAE.setCarBrandAndModelSelectors(new String[]{".carTitle>p>a", ""});
         tmpRentalCarsUAE.setRentalCarServiceProvider("Rental Cars UAE");
 
         return tmpRentalCarsUAE;
@@ -73,6 +81,10 @@ public class AppConfig {
         tmpDrivus.setBrandsSearchURL("https://www.drivus.ae/catalog/");
         tmpDrivus.setBrandsElementCSSClasses(".c-form-filter__brands .c-checkbox-brand__label");
         tmpDrivus.setNonBrandName("MG");
+        /*
+        NB: The Drivus website displays brand names but uses brand IDs for search.
+        The list below is used to map brand names with their IDs as used on the Drivus website.
+         */
         Map<String, Integer> brandNameIDs = new HashMap<>();
         brandNameIDs.put("KIA", 2);
         brandNameIDs.put("Nissan", 4);
@@ -93,10 +105,39 @@ public class AppConfig {
         tmpDrivus.setRentURLAnchorTagSelectors(new String[]{".c-product-panel__title>a", "href"});
         tmpDrivus.setImageTagSelectors(new String[]{".c-product-panel__img>a>img", "data-src"});
         tmpDrivus.setRentPerDayTagSelectors(new String[]{".c-product-panel__prices>ul :eq(2) .c-product-panel__price", ""});
+        tmpDrivus.setCarBrandAndModelSelectors(new String[]{".c-product-panel__title>a", ""});
         tmpDrivus.setRentalCarServiceProvider("Drivus");
 
         return tmpDrivus;
 
     }
+
+    /**
+     * Dependency injection for properties that will be used to scrape
+     * cars for hire from the PhantomRentCar website.
+     */
+    @Bean
+    public WebScraper PhantomRentCar(){
+
+        WebScraper tmpPhantomRentCar = new WebScraper();
+
+        // configure properties to scrape rental car brands
+        tmpPhantomRentCar.setBrandsSearchURL("https://phantomrentcar.com/search/");
+        tmpPhantomRentCar.setBrandsElementCSSClasses("#make option");
+        tmpPhantomRentCar.setNonBrandName("Car Brand");
+
+        // configure properties to scrape car hire details
+        tmpPhantomRentCar.setCarsSearchURL("https://phantomrentcar.com/search/?search=");
+        tmpPhantomRentCar.setCarElementCSSClasses(".car-card");
+        tmpPhantomRentCar.setRentURLAnchorTagSelectors(new String[]{".car-card>a", "href"});
+        tmpPhantomRentCar.setImageTagSelectors(new String[]{".car-card>a>img", "src"});
+        tmpPhantomRentCar.setRentPerDayTagSelectors(new String[]{".car-card .stm-icon-ac-offer-price+.brown.fs-25", ""});
+        tmpPhantomRentCar.setCarBrandAndModelSelectors(new String[]{".car-card .relative-card>div>h4", ""});
+        tmpPhantomRentCar.setRentalCarServiceProvider("Phantom Rent Car");
+
+        return tmpPhantomRentCar;
+
+    }
+
 
 }

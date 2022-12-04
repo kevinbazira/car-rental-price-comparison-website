@@ -28,6 +28,8 @@ public class WebScraper {
     private String[] rentURLAnchorTagSelectors;
     private String[] imageTagSelectors;
     private String[] rentPerDayTagSelectors;
+
+    private String[] carBrandAndModelSelectors;
     private String rentalCarServiceProvider;
 
     /**
@@ -106,6 +108,14 @@ public class WebScraper {
 
     public void setRentPerDayTagSelectors(String[] rentPerDayTagSelectors) {
         this.rentPerDayTagSelectors = rentPerDayTagSelectors;
+    }
+
+    public String[] getCarBrandAndModelSelectors() {
+        return carBrandAndModelSelectors;
+    }
+
+    public void setCarBrandAndModelSelectors(String[] carBrandAndModelSelectors) {
+        this.carBrandAndModelSelectors = carBrandAndModelSelectors;
     }
 
     public String getRentalCarServiceProvider() {
@@ -210,7 +220,8 @@ public class WebScraper {
             carData.add(rentPerDay);
 
             // Get the car brand and model
-            String carBrandAndModel = rentURLAnchorTag.text();
+            Elements carBrandAndModelTag = carsHTMLElements.get(i).select(carBrandAndModelSelectors[0]);
+            String carBrandAndModel = carBrandAndModelTag.text();
             carData.add(carBrandAndModel);
 
             // Car service provider
