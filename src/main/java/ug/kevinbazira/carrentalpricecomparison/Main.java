@@ -3,7 +3,6 @@ package ug.kevinbazira.carrentalpricecomparison;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,7 +23,7 @@ public class Main {
      * @param webScraper web scraper object of given website
      * @param priceComparisonDB object used to manipulate data in price comparison database
      */
-    public static void etl(WebScraper webScraper, PriceComparisonDB priceComparisonDB){
+    public static void extractTransformLoad(WebScraper webScraper, PriceComparisonDB priceComparisonDB){
         // Add car rental service provider to the db
         priceComparisonDB.addRentalService(webScraper.getRentalCarServiceProvider(), webScraper.getBrandsSearchURL());
         // Get scraped car brands from given website and add them to the db
@@ -77,7 +76,6 @@ public class Main {
             String rentalServiceName = carData.get(4);
             // Get rental service object from db. Its ID is to be used as a foreign key.
             RentalService rentalService = priceComparisonDB.getRentalService(rentalServiceName);
-            System.out.println("rentalService: " + rentalService.getId());
             // Get rent URL
             String rentURL = carData.get(0);
             // Add car model details to the db
@@ -135,127 +133,37 @@ public class Main {
         // Instruct Spring to create and wire beans using annotations.
         ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
 
-        /*** Get XCarRental bean
+        // Get XCarRental bean
         WebScraper xCarRental = (WebScraper) context.getBean("XCarRental");
         // Extract/scrape data from the XCarRental Website, transform it, and load/add it to the db.
-        etl(xCarRental, priceComparisonDB);
+         extractTransformLoad(xCarRental, priceComparisonDB);
 
         // Get RentalCarsUAE bean
         WebScraper rentalCarsUAE = (WebScraper) context.getBean("RentalCarsUAE");
         // Extract/scrape data from the RentalCarsUAE Website, transform it, and load/add it to the db.
-        etl(rentalCarsUAE, priceComparisonDB);
+         extractTransformLoad(rentalCarsUAE, priceComparisonDB);
 
         // Get Drivus bean
         WebScraper drivus = (WebScraper) context.getBean("Drivus");
         // Extract/scrape data from the Drivus Website, transform it, and load/add it to the db.
-        etl(drivus, priceComparisonDB);
+         extractTransformLoad(drivus, priceComparisonDB);
 
         // Get PhantomRentCar bean
         WebScraper phantomRentCar = (WebScraper) context.getBean("PhantomRentCar");
         // Extract/scrape data from the PhantomRentCar Website, transform it, and load/add it to the db.
-        etl(phantomRentCar, priceComparisonDB);
+         extractTransformLoad(phantomRentCar, priceComparisonDB);
 
         // Get QuickDrive bean
         WebScraper quickDrive = (WebScraper) context.getBean("QuickDrive");
         // Extract/scrape data from the QuickDrive Website, transform it, and load/add it to the db.
-        etl(quickDrive, priceComparisonDB);
-        */
+         extractTransformLoad(quickDrive, priceComparisonDB);
 
-        // List<String> quickDriveCarBrands = quickDrive.getCarBrands(); // PASSED!!!
-        // List<List<String>> quickDriveCarsData = quickDrive.getCarsData("Rolls-Royce");
-        // System.out.println("quickDriveCarsData: " + quickDriveCarsData);
-
-
-        // List<String> phantomRentCarCarBrands = phantomRentCar.getCarBrands(); // PASSED!!!
-        // List<List<String>> phantomRentCarCarsData = phantomRentCar.getCarsData("Range Rover");
-        // System.out.println("phantomRentCarCarsData: " + phantomRentCarCarsData);
-
-        /*String brandName = "KIA";
-        // List<String> drivusCarBrands = drivus.getCarBrands();
-        List<List<String>> drivusCarsData = drivus.getCarsData(String.valueOf(drivus.getBrandNameIDs().get(brandName)));
-        for(int i = 0; i < drivusCarsData.size(); i++){
-            List<String> carData = drivusCarsData.get(i);
-            // Get model image URL
-            String carModelImageURL = carData.get(1);
-            // Get brand and model name
-            String brandAndModelName = carData.get(3);
-            // Extract model name from brand and model name
-            String modelName = drivus.extractModelName(brandAndModelName, brandName);
-            // Only add model name to db if it's connected to the brand
-            if(!modelName.isEmpty()){
-                // Get model's car brand object from db. Its ID is to be used as a foreign key.
-                CarBrand modelCarBrandObj = priceComparisonDB.getCarBrand(brandName);
-                // Add car model details to the db
-                System.out.println("BrandID: " + modelCarBrandObj.getId());
-            }
-        }*/
-        // Get scraped car hire details from XCarRental website
-        // List<List<String>> drivusCarsData = drivus.getCarsData(String.valueOf(drivus.getBrandNameIDs().get(brandName)));
-        // System.out.println(drivusCarBrands);
-
-
-
-        /*** Add car rental service provider to the db
-        priceComparisonDB.addRentalService(xCarRental.getRentalCarServiceProvider(), xCarRental.getBrandsSearchURL());
-        // Get scraped car brands from XCarRental website and add them to the db
-        List<String> xCarRentalCarBrands = xCarRental.getCarBrands();
-        // Add car brands to db
-        priceComparisonDB.addCarBrands(xCarRentalCarBrands);
-        // Loop through each car brand, get scraped car data and
-        // use it to add the car model + car hire details to the db.
-        for(int i = 0; i < xCarRentalCarBrands.size(); i++){
-            String brandName = xCarRentalCarBrands.get(i);
-            // Get scraped car hire details from XCarRental website
-            List<List<String>> xCarRentalCarsData = xCarRental.getCarsData(brandName);
-            // Add car model details to database
-            addCarModelDetailsToDB(brandName, xCarRentalCarsData, xCarRental, priceComparisonDB);
-            // Add car hire details to database
-            addCarHireDetailsToDB(brandName, xCarRentalCarsData, xCarRental, priceComparisonDB);
-        }
-        */
-
-
-        /*// Add car model details to database
-        String brandName = "Lamborghini"; // Lamborghini, Audi
-        List<List<String>> xCarRentalCarsData = xCarRental.getCarsData(brandName);
-        addCarModelDetailsToDB(brandName, xCarRentalCarsData, xCarRental, priceComparisonDB);
-        */
-
-       /* // Add car hire details to database
-        String brandName = "Lamborghini";
-        List<List<String>> xCarRentalCarsData = xCarRental.getCarsData(brandName);
-        addCarHireDetailsToDB(brandName, xCarRentalCarsData, xCarRental, priceComparisonDB);
-        */
-
-        // FINALLY WORKED ... phew!!!
-        /*CarBrand tmpCarBrand = priceComparisonDB.getCarBrand("Lamborghini");
-        System.out.println("tmpCarBrand ID: " + tmpCarBrand.getId());
-        */
-
-
-        // >>> car model === scraped car name - brand name
-        // >>> get brand names from db and loop through each to get car details
-        // get brandAndModel text > split it to brandName and modelName > get brandName (skipped for now. loop required.) > add modelName + brandNameID to DB
-
-        //Call methods on XCarRental bean - NEXT figure out a way to add these to the DB, then you'll loop through individual brands using the AppConfig section
-        // System.out.println("xCarRental.getCarBrands(): " + xCarRental.getCarBrands());
-        // System.out.println("xCarRental.getCarsData(): " + xCarRental.getCarsData());
-
-
-        // Run db transactions
-        // priceComparisonDB.addCarBrand("Mitsubishi");
-        // priceComparisonDB.addCarBrands(new String[]{"Land Cruiser", "Range Rover", "Mitsubishi"});
-        // priceComparisonDB.addCarModel();
-        // priceComparisonDB.addRentalService();
-        // priceComparisonDB.addCarData();
-
-        // Shut down db SessionFactory
+        // Shut down the db SessionFactory
         priceComparisonDB.shutDown();
 
         // End program timer
         long programRunTime = System.nanoTime() - programStartTime;
         System.out.println("This program run for: " + programRunTime + " nanoseconds.");
-
 
     }
 }
