@@ -17,6 +17,7 @@ public class AppConfig {
     /**
      * Dependency injection for properties that will be used to scrape
      * cars for hire from the XCarRental website.
+     * @return XCarRental java bean
      */
     @Bean
     public WebScraper XCarRental(){
@@ -44,6 +45,7 @@ public class AppConfig {
     /**
      * Dependency injection for properties that will be used to scrape
      * cars for hire from the RentalCarsUAE website.
+     * @return RentalCarsUAE java bean
      */
     @Bean
     public WebScraper RentalCarsUAE(){
@@ -71,6 +73,7 @@ public class AppConfig {
     /**
      * Dependency injection for properties that will be used to scrape
      * cars for hire from the Drivus website.
+     * @return Drivus java bean
      */
     @Bean
     public WebScraper Drivus(){
@@ -115,6 +118,7 @@ public class AppConfig {
     /**
      * Dependency injection for properties that will be used to scrape
      * cars for hire from the PhantomRentCar website.
+     * @return PhantomRentCar java bean
      */
     @Bean
     public WebScraper PhantomRentCar(){
@@ -142,6 +146,7 @@ public class AppConfig {
     /**
      * Dependency injection for properties that will be used to scrape
      * cars for hire from the QuickDrive website.
+     * @return QuickDrive java bean
      */
     @Bean
     public WebScraper QuickDrive(){
