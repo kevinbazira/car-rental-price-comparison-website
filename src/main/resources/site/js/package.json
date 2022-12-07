@@ -1,0 +1,17 @@
+{
+  "name": "week9_restfulwebservice",
+  "version": "1.0.0",
+  "main": "callback_example.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql": "^2.18.1",
+    "url": "^0.11.0"
+  }
+}
