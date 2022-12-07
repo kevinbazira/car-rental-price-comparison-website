@@ -11,6 +11,7 @@
     <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.10/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 <body>
     <div id="app">
@@ -107,63 +108,23 @@
                             </div>
                         </div>
                        
-                        <div class="col-lg-4 col-md-6 col-sm-12 pb-1">
+                        <div class="col-lg-4 col-md-6 col-sm-12 pb-1" v-for="car in carsData">
                             <div class="card product-item border-0 mb-4">
                                 <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
-                                    <img class="img-fluid w-100" src="img/test-image.png">
+                                    <img class="img-fluid w-100" v-bind:src="car.image_url">
                                 </div>
                                 <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
-                                    <h6 class="text-truncate mb-3">Car Brand & Model</h6>
+                                    <h6 class="text-truncate mb-3">{{ car.car_brand_name }} {{ car.car_model_name }}</h6>
                                     <div class="d-flex justify-content-center">
-                                        <h6>AED Rent per day</h6><h6 class="text-muted ml-2"></h6>
+                                        <h6>AED {{ car.rent_per_day }} per day</h6>
                                     </div>
-                                    <span>Service Provider</span>
+                                    <span>{{ car.rental_service }}</span>
                                 </div>
                                 <div class="card-footer bg-light border text-center">
-                                    <button class="btn btn-sm text-dark p-0 w-100 h-100">
+                                    <a v-bind:href="car.rent_url" class="btn btn-sm text-dark p-0 w-100 h-100" target="_blank">
                                             <i class="fas fa-car text-primary mr-1"></i>
-                                            Rent It
-                                    </button>
-                                </div>
-                            </div>   
-                        </div>
-                        <div class="col-lg-4 col-md-6 col-sm-12 pb-1">
-                            <div class="card product-item border-0 mb-4">
-                                <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
-                                    <img class="img-fluid w-100" src="img/test-image.png">
-                                </div>
-                                <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
-                                    <h6 class="text-truncate mb-3">Car Brand & Model</h6>
-                                    <div class="d-flex justify-content-center">
-                                        <h6>AED Rent for X days</h6><h6 class="text-muted ml-2"></h6>
-                                    </div>
-                                    <span>Service Provider</span>
-                                </div>
-                                <div class="card-footer bg-light border text-center">
-                                    <button class="btn btn-sm text-dark p-0 w-100 h-100">
-                                            <i class="fas fa-car text-primary mr-1"></i>
-                                            Rent It
-                                    </button>
-                                </div>
-                            </div>   
-                        </div>
-                        <div class="col-lg-4 col-md-6 col-sm-12 pb-1">
-                            <div class="card product-item border-0 mb-4">
-                                <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
-                                    <img class="img-fluid w-100" src="img/test-image.png">
-                                </div>
-                                <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
-                                    <h6 class="text-truncate mb-3">Car Brand & Model</h6>
-                                    <div class="d-flex justify-content-center">
-                                        <h6>AED Rent per day</h6><h6 class="text-muted ml-2"></h6>
-                                    </div>
-                                    <span>Service Provider</span>
-                                </div>
-                                <div class="card-footer bg-light border text-center">
-                                    <button class="btn btn-sm text-dark p-0 w-100 h-100">
-                                            <i class="fas fa-car text-primary mr-1"></i>
-                                            Rent It
-                                    </button>
+                                            Rent
+                                    </a>
                                 </div>
                             </div>   
                         </div>
@@ -207,13 +168,34 @@
         let webstore = new Vue({
             el: "#app",
             data: {
-                sitename: "Car Rental Price Comparison"
+                sitename: "Car Rental Price Comparison",
+                carsData: []
             },
             methods: {
-                
+                // Get cars data from the web service using Axios.
+                loadCarsData: function (){
+                    var localApp = this;
+                    axios.get('/cars-data?num-cars=12&offset=0') // Send GET request to cars-data path
+                        .then(function (response) {// Request successful
+                            // Point cars in data to returned array of carsData
+                            localApp.carsData = response.data.carsData;
+                            console.log("carsData: " + JSON.stringify(response.data.carsData));
+                        })
+                        .catch(function (error) {
+                            // Handle error
+                            console.log(error);
+                        });
+                 }
             },
             computed: {
                 
+            },
+            created: function(){ // Vue lifecycle hook, called when data is loaded.
+                // Load cereals from web service
+                this.loadCarsData();
+
+                //Refresh cereals every 5 seconds. Completes the VM in MVVM :)
+                // setInterval(this.loadCarsData, 5000);
             }
         });
     </script>

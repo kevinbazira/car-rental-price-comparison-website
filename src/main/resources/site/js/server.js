@@ -21,13 +21,8 @@ const connectionPool = mysql.createPool({
     debug: false
 });
 
-// Set up the application to handle GET requests sent to the user path
-// app.get('/cereals', handleGetRequest);
-// app.get('/cereals/*', handleGetRequest);//Subfolders
-// app.get('/cereals', handleGetRequest);
-
-// Serve up static pages from public folder
-// app.use(express.static('public'));
+// Serve up static pages from site root directory
+app.use(express.static('../'));
 
 // Start the app listening on port 8080
 app.listen(8080);
@@ -100,13 +95,13 @@ app.get('/car-brand-or-model', handleGetRequest);
  * This function should be called in the callback of getCarsDataWithTotalCount. 
  */
 const getCarsData = (response, totalNumCars, numCars, offset) => {
-    // Select the cars data using JOIN to convert foreign keys into useful data.
-    let sql = "SELECT `id`, `car_model_id`, `rent_per_day`, `rental_service_id`, `rent_url`, `date_scraped` FROM `cars_data_tbl`";
+    // Select the cars data using WHERE to convert foreign keys into useful data.
+    let sql = "SELECT a.id, c.name AS car_brand_name, b.name AS car_model_name, b.image_url, a.rent_per_day, d.name AS rental_service, a.rent_url, a.date_scraped FROM cars_data_tbl AS a, car_model_tbl AS b, car_brand_tbl AS c, rental_services_tbl AS d WHERE a.car_model_id = b.id AND b.car_brand_id = c.id AND a.rental_service_id = d.id";
 
     
     // Limit the number of results returned, if this has been specified in the query string
     if(numCars !== undefined && offset !== undefined ){
-        sql += "LIMIT " + numCars + " OFFSET " + offset;
+        sql += " LIMIT " + numCars + " OFFSET " + offset;
     }
 
     // Execute the query
@@ -170,7 +165,7 @@ const getCarsDataWithTotalCount = (response, numCars, offset) => {
     
     // Limit the number of results returned, if this has been specified in the query string
     if(numCars !== undefined && offset !== undefined ){
-        sql += "LIMIT " + numCars + " OFFSET " + offset;
+        sql += " LIMIT " + numCars + " OFFSET " + offset;
     }
 
     // Execute the query
@@ -233,7 +228,7 @@ const getCarBrandDataWithTotalCount = (response, name, numCars, offset) => {
     
     // Limit the number of results returned, if this has been specified in the query string
     if(numCars !== undefined && offset !== undefined ){
-        sql += "LIMIT " + numCars + " OFFSET " + offset;
+        sql += " LIMIT " + numCars + " OFFSET " + offset;
     }
 
     // Execute the query
