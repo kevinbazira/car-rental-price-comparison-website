@@ -147,7 +147,7 @@ const getCarsDataWithTotalCount = (response, numCars, offset) => {
         // Get the total number of items from the result
         const totalNumCars = result[0]['COUNT(*)'];
         
-        // Call the function that retrieves all cereals
+        // Call the function that retrieves cars data
         getCarsData(response, totalNumCars, numCars, offset);
     });
 }
