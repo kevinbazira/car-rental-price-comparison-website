@@ -77,15 +77,9 @@
                         </a>
                         <nav class="collapse show navbar navbar-vertical navbar-light align-items-start p-0 border border-top-0 border-bottom-0" id="navbar-vertical">
                             <div class="navbar-nav w-100 overflow-hidden">
-                                <a href="" class="nav-item nav-link">Shirts</a>
-                                <a href="" class="nav-item nav-link">Jeans</a>
-                                <a href="" class="nav-item nav-link">Swimwear</a>
-                                <a href="" class="nav-item nav-link">Sleepwear</a>
-                                <a href="" class="nav-item nav-link">Sportswear</a>
-                                <a href="" class="nav-item nav-link">Jumpsuits</a>
-                                <a href="" class="nav-item nav-link">Blazers</a>
-                                <a href="" class="nav-item nav-link">Jackets</a>
-                                <a href="" class="nav-item nav-link">Shoes</a>
+                                <a href="#view-results" v-on:click="showBrandCars(brand.name)" v-bind:class="selectedBrandName === brand.name ? 'nav-item nav-link active' : 'nav-item nav-link'" v-for="brand in carBrands">
+                                    {{ brand.name }}
+                                </a>
                             </div>
                         </nav>
                     </div>
@@ -104,8 +98,12 @@
                                     </button>
                                 </div>
                             </form>
-                            <div class="d-flex align-items-center justify-content-between mb-4">
-                                
+                            <div class="d-flex align-items-center justify-content-between mb-4 mt-4" id="view-results">
+                                <div class="container-fluid bg-primary">
+                                    <div class="d-flex flex-column align-items-center justify-content-center" style="min-height:60px">
+                                        <h6 class="m-0 text-white">Results for {{ viewingItem }} | Page: {{ currentPageNumber }} of {{ numberOfPages }}</h6>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                        
@@ -171,17 +169,29 @@
                 sitename: "Car Rental Price Comparison",
                 carsData: [],
                 numberOfPages: 0,
-                carsToDisplayPerPage: 12
+                currentPageNumber: 0,
+                carsToDisplayPerPage: 12,
+                viewingItem: "",
+                carBrands: [],
+                selectedBrandName: ""
             },
             methods: {
                 loadCarsData(offset){
                     // Get cars data from the web service using Axios.
                     const localApp = this;
-                    axios.get('/cars-data?num-cars=12&offset=' + offset) // Send GET request to cars-data path
+                    let tmpViewingItem = "All Cars";
+                    let brandNameQueryString = "";
+                    if(!!this.selectedBrandName){
+                        // If selectedBrandName exists, set brandNameQueryString and tmpViewingItem
+                        brandNameQueryString = "&car-brand=" + this.selectedBrandName;
+                        tmpViewingItem = "Car Brand: " + this.selectedBrandName;
+                    }
+                    axios.get('/cars-data?num-cars=12&offset=' + offset + brandNameQueryString) // Send GET request to cars-data path with query strings
                         .then((response)=>{// Request successful
-                            // Set both carsData and numberOfPages based on data returned in respone.
+                            // Set both carsData, numberOfPages, and viewingItem based on data returned in respone.
                             localApp.setCarsData(response.data.carsData);
                             localApp.setNumberOfPages(response.data.totalNumCars);
+                            localApp.setViewingItem(tmpViewingItem);
                             console.log("totalNumCars: " + JSON.stringify(response.data.totalNumCars));
                             console.log("carsData: " + JSON.stringify(response.data.carsData));
                         })
@@ -198,10 +208,48 @@
                     // Set number of pages used for pagination.
                     this.numberOfPages = Math.ceil(totalCars / this.carsToDisplayPerPage);
                 },
+                setCurrentPageNumber(pageNum){
+                    // Set the current page number.
+                    this.currentPageNumber = pageNum;
+                },
+                setViewingItem(viewingItem){
+                    // Set the item's results being viewed.
+                    this.viewingItem = viewingItem;
+                    
+                },
                 handlePagination(pageNum){
                     // Fetch new set of data based on the page number selected.
                     offset = (pageNum - 1) * this.carsToDisplayPerPage;
                     this.loadCarsData(offset);
+                    // set current page number
+                    this.setCurrentPageNumber(pageNum);
+                },
+                loadCarBrands(){
+                    // Get car brands data from the web service using Axios.
+                    const localApp = this;
+                    axios.get('/car-brands') // Send GET request to car-brands path
+                        .then((response)=>{// Request successful
+                            // Set carBrands based on data returned in respone.
+                            localApp.setCarBrands(response.data);
+                            console.log("carBrands: " + JSON.stringify(response.data));
+                        })
+                        .catch((error)=>{
+                            // Handle error
+                            console.log(error);
+                        });
+                },
+                setCarBrands(carBrands){
+                    this.carBrands = carBrands;
+                },
+                setSelectedBrandName(selectedBrandName){
+                    this.selectedBrandName = selectedBrandName;
+                },
+                showBrandCars(brandName){
+                    // Set selected brand name
+                    this.setSelectedBrandName(brandName);
+                    // Load cars data
+                    this.loadCarsData(0);
+                    console.log(brandName);
                 }
             },
             computed: {
@@ -210,6 +258,7 @@
             created() { // Vue lifecycle hook, called when data is loaded.
                 // Load cars data from web service with offset=0
                 this.loadCarsData(0);
+                this.loadCarBrands();
 
                 //Refresh cars data every 5 seconds. Completes the VM in MVVM :)
                 // setInterval(this.loadCarsData, 5000);

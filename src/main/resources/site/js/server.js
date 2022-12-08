@@ -41,6 +41,7 @@ const handleGetRequest = (request, response) => {
 
     // Get the pagination properties if they have been set. Will be undefined if not set.
     const name = queries['name'];
+    const carBrand = queries['car-brand'];
     const numCars = queries['num-cars'];
     const offset = queries['offset'];
 
@@ -52,7 +53,13 @@ const handleGetRequest = (request, response) => {
 
     // If path ends with 'cars-data' we return all cars
     if(pathEnd === 'cars-data'){
-        getCarsDataWithTotalCount(response, numCars, offset);
+        getCarsDataWithTotalCount(response,  carBrand, numCars, offset);
+        return;
+    }
+
+    // If path ends with 'car-brands' we return all car brands
+    if(pathEnd === 'car-brands'){
+        getCarBrands(response);
         return;
     }
 
@@ -85,7 +92,8 @@ const handleGetRequest = (request, response) => {
 
 // Set up the application to handle GET requests sent to the user path
 app.get('/cars-data', handleGetRequest);
-app.get('/car-brand', handleGetRequest);
+app.get('/car-brands', handleGetRequest);
+// app.get('/car-brand', handleGetRequest);
 app.get('/car-brand-or-model', handleGetRequest);
 
 
@@ -94,18 +102,22 @@ app.get('/car-brand-or-model', handleGetRequest);
  * Possibly limit on the total number of cars returned and the offset (for pagination). 
  * This function should be called in the callback of getCarsDataWithTotalCount. 
  */
-const getCarsData = (response, totalNumCars, numCars, offset) => {
+const getCarsData = (response, carBrand, totalNumCars, numCars, offset) => {
     // Select the cars data using WHERE to convert foreign keys into useful data.
-    let sql = "SELECT a.id, c.name AS car_brand_name, b.name AS car_model_name, b.image_url, a.rent_per_day, d.name AS rental_service, a.rent_url, a.date_scraped FROM cars_data_tbl AS a, car_model_tbl AS b, car_brand_tbl AS c, rental_services_tbl AS d WHERE a.car_model_id = b.id AND b.car_brand_id = c.id AND a.rental_service_id = d.id";
+    let slqCarsData = "SELECT a.id, c.name AS car_brand_name, b.name AS car_model_name, b.image_url, a.rent_per_day, d.name AS rental_service, a.rent_url, a.date_scraped FROM cars_data_tbl AS a, car_model_tbl AS b, car_brand_tbl AS c, rental_services_tbl AS d WHERE a.car_model_id = b.id AND b.car_brand_id = c.id AND a.rental_service_id = d.id";
 
+    // Add car brand to SQL query if provided
+    if(carBrand !== undefined){
+        slqCarsData += " AND c.name = '" + carBrand + "'";
+    }
     
     // Limit the number of results returned, if this has been specified in the query string
     if(numCars !== undefined && offset !== undefined ){
-        sql += " LIMIT " + numCars + " OFFSET " + offset;
+        slqCarsData += " LIMIT " + numCars + " OFFSET " + offset;
     }
 
     // Execute the query
-    connectionPool.query(sql, (err, result) => {
+    connectionPool.query(slqCarsData, (err, result) => {
 
         // Check for errors
         if (err){
@@ -130,11 +142,19 @@ const getCarsData = (response, totalNumCars, numCars, offset) => {
  * The database callback function will then call the function to get the cars data
  * with pagination.
  */
-const getCarsDataWithTotalCount = (response, numCars, offset) => {
-    let sql = "SELECT COUNT(*) FROM cars_data_tbl";
+const getCarsDataWithTotalCount = (response, carBrand, numCars, offset) => {
+    let slqCarsData = "SELECT a.id, c.name AS car_brand_name, b.name AS car_model_name, b.image_url, a.rent_per_day, d.name AS rental_service, a.rent_url, a.date_scraped FROM cars_data_tbl AS a, car_model_tbl AS b, car_brand_tbl AS c, rental_services_tbl AS d WHERE a.car_model_id = b.id AND b.car_brand_id = c.id AND a.rental_service_id = d.id";
+    let sqlCount = "SELECT COUNT(*) FROM ";
+
+    // Add car brand to SQL query if provided
+    if(carBrand !== undefined){
+        sqlCount += "(" + slqCarsData + " AND c.name = '" + carBrand + "') as cars_data";
+    } else {
+        sqlCount += "(" + slqCarsData + ") as cars_data";
+    }
 
     // Execute the query and call the anonymous callback function.
-    connectionPool.query(sql, (err, result) => {
+    connectionPool.query(sqlCount, (err, result) => {
 
         // Check for errors
         if (err){
@@ -148,10 +168,33 @@ const getCarsDataWithTotalCount = (response, numCars, offset) => {
         const totalNumCars = result[0]['COUNT(*)'];
         
         // Call the function that retrieves cars data
-        getCarsData(response, totalNumCars, numCars, offset);
+        getCarsData(response, carBrand, totalNumCars, numCars, offset);
     });
 }
 
+
+/** 
+ * Returns all car brands.
+ */
+ const getCarBrands = (response) => {
+    // Select the car brands data
+    let sql = "SELECT id, name FROM car_brand_tbl";
+
+    // Execute the query
+    connectionPool.query(sql, (err, result) => {
+
+        // Check for errors
+        if (err){
+            // Not an ideal error code, but we don't know what has gone wrong.
+            response.status(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+            response.json({'error': true, 'message': + err});
+            return;
+        }
+
+        // Return results in JSON format
+        response.json(result);
+    });
+}
 
 /** 
  * Returns all cars data of a specified brand appended to total number of cars.
