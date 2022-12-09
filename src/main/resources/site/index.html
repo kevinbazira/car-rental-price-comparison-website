@@ -204,8 +204,8 @@
                 carBrands: [],
                 selectedBrandName:"",
                 selectedDate: {
-                    start: '',
-                    end: ''
+                    start: "",
+                    end: ""
                 },
                 selectedDays: 0,
                 modelsInBrand: [],
@@ -300,8 +300,9 @@
                 showBrandCars(brandName){
                     // Set selected brand name
                     this.setSelectedBrandName(brandName);
-                    // Remove selectedModelInBrand to avoid selectedBrandName that doesn't match selectedModelInBrand
+                    // Remove selectedModelInBrand and searchTerm to avoid conflicting results that don't match selectedBrandName
                     this.selectedModelInBrand = "";
+                    this.searchTerm = "";
                     // Load cars data
                     this.loadCarsData(0);
                     console.log(brandName);
