@@ -42,6 +42,8 @@ const handleGetRequest = (request, response) => {
     // Get the pagination properties if they have been set. Will be undefined if not set.
     const name = queries['name'];
     const carBrand = queries['car-brand'];
+    const carModel = queries['car-model'];
+    const searchTerm = queries['search-term'];
     const numCars = queries['num-cars'];
     const offset = queries['offset'];
 
@@ -53,13 +55,24 @@ const handleGetRequest = (request, response) => {
 
     // If path ends with 'cars-data' we return all cars
     if(pathEnd === 'cars-data'){
-        getCarsDataWithTotalCount(response,  carBrand, numCars, offset);
+        getCarsDataWithTotalCount(response,  carBrand, carModel, searchTerm, numCars, offset);
         return;
     }
 
     // If path ends with 'car-brands' we return all car brands
     if(pathEnd === 'car-brands'){
         getCarBrands(response);
+        return;
+    }
+
+    // If path ends with 'car-models-in-brand' we return all cars in models of a specified brand name
+    if(pathEnd === 'car-models-in-brand'){
+        if(!carBrand){  
+            // return error message if car brand name is not specified
+            response.send("{error: 'Setting car-brand query string is required to get cars in models of a specified brand'}");
+        } else {
+            getCarModelsInBrand(response, carBrand);
+        }
         return;
     }
 
@@ -93,6 +106,7 @@ const handleGetRequest = (request, response) => {
 // Set up the application to handle GET requests sent to the user path
 app.get('/cars-data', handleGetRequest);
 app.get('/car-brands', handleGetRequest);
+app.get('/car-models-in-brand', handleGetRequest);
 // app.get('/car-brand', handleGetRequest);
 app.get('/car-brand-or-model', handleGetRequest);
 
@@ -102,12 +116,19 @@ app.get('/car-brand-or-model', handleGetRequest);
  * Possibly limit on the total number of cars returned and the offset (for pagination). 
  * This function should be called in the callback of getCarsDataWithTotalCount. 
  */
-const getCarsData = (response, carBrand, totalNumCars, numCars, offset) => {
+const getCarsData = (response, carBrand, carModel, searchTerm, totalNumCars, numCars, offset) => {
     // Select the cars data using WHERE to convert foreign keys into useful data.
     let slqCarsData = "SELECT a.id, c.name AS car_brand_name, b.name AS car_model_name, b.image_url, a.rent_per_day, d.name AS rental_service, a.rent_url, a.date_scraped FROM cars_data_tbl AS a, car_model_tbl AS b, car_brand_tbl AS c, rental_services_tbl AS d WHERE a.car_model_id = b.id AND b.car_brand_id = c.id AND a.rental_service_id = d.id";
-
+   
     // Add car brand to SQL query if provided
-    if(carBrand !== undefined){
+    if(searchTerm !== undefined){
+        // If searchTerm exists
+        slqCarsData += " AND (c.name LIKE '%" + searchTerm + "%' OR b.name LIKE '%" + searchTerm + "%')";
+    } else if(carBrand !== undefined && carModel !== undefined){
+        // If both carBrand and carModel exist
+        slqCarsData += " AND c.name = '" + carBrand + "' AND b.name = '" + carModel + "'";
+    } else if(carBrand !== undefined && carModel === undefined){
+        // If only carBrand exists and carModel desn't
         slqCarsData += " AND c.name = '" + carBrand + "'";
     }
     
@@ -142,12 +163,19 @@ const getCarsData = (response, carBrand, totalNumCars, numCars, offset) => {
  * The database callback function will then call the function to get the cars data
  * with pagination.
  */
-const getCarsDataWithTotalCount = (response, carBrand, numCars, offset) => {
+const getCarsDataWithTotalCount = (response, carBrand, carModel, searchTerm, numCars, offset) => {
     let slqCarsData = "SELECT a.id, c.name AS car_brand_name, b.name AS car_model_name, b.image_url, a.rent_per_day, d.name AS rental_service, a.rent_url, a.date_scraped FROM cars_data_tbl AS a, car_model_tbl AS b, car_brand_tbl AS c, rental_services_tbl AS d WHERE a.car_model_id = b.id AND b.car_brand_id = c.id AND a.rental_service_id = d.id";
     let sqlCount = "SELECT COUNT(*) FROM ";
 
-    // Add car brand to SQL query if provided
-    if(carBrand !== undefined){
+    // Add car brand and model to SQL query if provided
+    if(searchTerm !== undefined){
+        // If searchTerm exists
+        sqlCount += "(" + slqCarsData + " AND (c.name LIKE '%" + searchTerm + "%' OR b.name LIKE '%" + searchTerm + "%')) as cars_data";
+    } else if(carBrand !== undefined && carModel !== undefined){
+        // If both carBrand and carModel exist
+        sqlCount += "(" + slqCarsData + " AND c.name = '" + carBrand + "' AND b.name = '" + carModel + "') as cars_data";
+    } else if(carBrand !== undefined && carModel === undefined){
+        // If only carBrand exists and carModel desn't
         sqlCount += "(" + slqCarsData + " AND c.name = '" + carBrand + "') as cars_data";
     } else {
         sqlCount += "(" + slqCarsData + ") as cars_data";
@@ -166,9 +194,9 @@ const getCarsDataWithTotalCount = (response, carBrand, numCars, offset) => {
 
         // Get the total number of items from the result
         const totalNumCars = result[0]['COUNT(*)'];
-        
+
         // Call the function that retrieves cars data
-        getCarsData(response, carBrand, totalNumCars, numCars, offset);
+        getCarsData(response, carBrand, carModel, searchTerm, totalNumCars, numCars, offset);
     });
 }
 
@@ -178,10 +206,34 @@ const getCarsDataWithTotalCount = (response, carBrand, numCars, offset) => {
  */
  const getCarBrands = (response) => {
     // Select the car brands data
-    let sql = "SELECT id, name FROM car_brand_tbl";
+    let sqlCarBrands = "SELECT id, name FROM car_brand_tbl";
 
     // Execute the query
-    connectionPool.query(sql, (err, result) => {
+    connectionPool.query(sqlCarBrands, (err, result) => {
+
+        // Check for errors
+        if (err){
+            // Not an ideal error code, but we don't know what has gone wrong.
+            response.status(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+            response.json({'error': true, 'message': + err});
+            return;
+        }
+
+        // Return results in JSON format
+        response.json(result);
+    });
+}
+
+
+/** 
+ * Returns all car models in a specified brand.
+ */
+ const getCarModelsInBrand = (response, carBrand) => {
+    // Select the car brands data
+    let sqlCarModelsInBrand = "SELECT a.id, a.name AS model_name, a.car_brand_id, b.name AS brand_name, a.image_url FROM car_model_tbl AS a, car_brand_tbl AS b WHERE a.car_brand_id = b.id AND b.name='" + carBrand + "'";
+
+    // Execute the query
+    connectionPool.query(sqlCarModelsInBrand, (err, result) => {
 
         // Check for errors
         if (err){

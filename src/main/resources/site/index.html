@@ -7,12 +7,14 @@
     <title>Car Rental Price Comparison</title>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"> 
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/vue-ctk-date-time-picker@1.4.1/dist/vue-ctk-date-time-picker.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.10/dist/vue.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://unpkg.com/vuejs-paginate@0.9.0"></script>
+    <script src="https://unpkg.com/vue-rangedate-picker@1.0.0/dist/vue-rangedate-picker.min.js"></script>
 </head>
 <body>
     <div id="app">
@@ -29,36 +31,37 @@
                             <h4 class="text-light text-uppercase font-weight-medium mb-3">Get The Best Offers!</h4>
                             <h3 class="display-4 text-white font-weight-semi-bold mb-4">{{sitename}}</h3>
                             <div class="container">
-                                <form class="row">
-                                    <div class="col-sm-3 text-left">
-                                        <label for="pick-up-date" class="text-left">Pick-Up Date</label>
-                                        <input type="date" id="pick-up-date" name="rent-start-date" class="header-search" value="2018-12-04" min="2022-12-01" max="2023-12-30">
+                                <form class="row col-12">
+                                    <div class="col-3 text-left">
+                                        <label for="date-range-picker" class="text-left">Date Range</label>
+                                        <vue-rangedate-picker 
+                                            id="date-range-picker"
+                                            class="w-100"
+                                            @selected="onDateSelected" 
+                                            i18n="EN">
+                                        </vue-rangedate-picker>
                                     </div>
-                                    <div class="col-sm-3 text-left">
-                                        <label for="pick-up-date">Drop-Off Date</label>
-                                        <input type="date" id="drop-off-date" name="rent-end-date" class="header-search" value="2022-12-15" min="2022-12-01" max="2023-12-30">
-                                    </div>
-                                    <div class="col-sm-2 text-left">
+                                    <div class="col-3 text-left">
                                         <label for="car-brand">Brand</label>
-                                        <select class="form-select header-search" aria-label="select car brand" id="car-brand">
-                                          <option selected></option>
-                                          <option value="1">One</option>
-                                          <option value="2">Two</option>
-                                          <option value="3">Three</option>
+                                        <select class="form-select header-search w-100" v-model="selectedBrandName" @change="showModelCarsInBrand()" aria-label="select car brand" id="car-brand">
+                                            <option>All Brands</option>
+                                            <option v-for="brand in carBrands" v-bind:value="brand.name">
+                                                {{ brand.name }}
+                                            </option>
                                         </select>
                                     </div>
-                                    <div class="col-sm-2 text-left">
-                                      <label for="car-model">Model</label>
-                                      <select class="form-select header-search" aria-label="select car model" id="car-model">
-                                        <option selected></option>
-                                        <option value="1">One</option>
-                                        <option value="2">Two</option>
-                                        <option value="3">Three</option>
-                                      </select>
+                                    <div class="col-3 text-left">
+                                        <label for="car-model">Model</label>
+                                        <select class="form-select header-search w-100" v-model="selectedModelInBrand"  aria-label="select car model" id="car-model">
+                                            <option>All Models</option>
+                                            <option v-for="model in modelsInBrand" v-bind:value="model.model_name">{{ model.model_name }}</option>
+                                        </select>
                                     </div>
-                                    <div class="col-sm-2 text-left">
-                                        <label for="car-model" style="color: transparent;">.</label>
-                                        <a href="" class="btn btn-light py-2 px-3">Search</a>
+                                    <div class="col-3 text-left">
+                                        <label for="search-btn" style="color: transparent;">Search</label>
+                                        <a href="#view-results" v-on:click="showCarsInSelectedBrandAndModel()" class="btn btn-light py-2 px-3 w-100" id="search-btn">
+                                            Search
+                                        </a>
                                     </div>
                                 </form>
                             </div>
@@ -90,12 +93,12 @@
                         <div class="col-12 pb-1">
                             <form class="w-100">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Search by car brand or model">
-                                    <button class="input-group-append bg-transparent border search-btn">
+                                    <input type="text" v-model="searchTerm" class="form-control" placeholder="Search by car brand or model">
+                                    <a href="#view-results" v-on:click="searchCarsInBrandOrModel()" class="input-group-append bg-transparent border search-btn">
                                         <span class="input-group-text bg-transparent text-primary border-0">
                                             <i class="fa fa-search"></i>
                                         </span>
-                                    </button>
+                                    </a>
                                 </div>
                             </form>
                             <div class="d-flex align-items-center justify-content-between mb-4 mt-4" id="view-results">
@@ -115,7 +118,7 @@
                                 <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
                                     <h6 class="text-truncate mb-3">{{ car.car_brand_name }} {{ car.car_model_name }}</h6>
                                     <div class="d-flex justify-content-center">
-                                        <h6>AED {{ car.rent_per_day }} per day</h6>
+                                        <h6>AED {{ !selectedDays ? car.rent_per_day + ' per day' : (car.rent_per_day * selectedDays) + ' for ' + selectedDays + ' day(s)'  }}</h6>
                                     </div>
                                     <span>{{ car.rental_service }}</span>
                                 </div>
@@ -156,11 +159,38 @@
                 &copy; <a class="text-dark font-weight-semi-bold" href="#">Kevin Bazira</a>. All Rights Reserved.
             </p>
         </div>
+
+        <div v-if="showErrorModal">
+            <transition name="modal">
+              <div class="modal-mask">
+                <div class="modal-wrapper">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Ooops!</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true" @click="showErrorModal = false">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <p>Please select both a car brand and model name.</p>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="showErrorModal = false">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </transition>
+        </div>
+
     </div> 
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
     <script type="text/javascript">
         Vue.component('paginate', VuejsPaginate);
+        VueRangedatePicker.default.install(Vue);
     </script>
     <script type="text/javascript">
         const carRentalPriceComparison = new Vue({
@@ -169,24 +199,48 @@
                 sitename: "Car Rental Price Comparison",
                 carsData: [],
                 numberOfPages: 0,
-                currentPageNumber: 0,
+                currentPageNumber: 1,
                 carsToDisplayPerPage: 12,
                 viewingItem: "",
                 carBrands: [],
-                selectedBrandName: ""
+                selectedBrandName:"",
+                selectedDate: {
+                    start: '',
+                    end: ''
+                },
+                selectedDays: 0,
+                modelsInBrand: [],
+                selectedModelInBrand:"",
+                showErrorModal: false,
+                searchTerm: ""
             },
             methods: {
                 loadCarsData(offset){
                     // Get cars data from the web service using Axios.
                     const localApp = this;
                     let tmpViewingItem = "All Cars";
-                    let brandNameQueryString = "";
-                    if(!!this.selectedBrandName){
-                        // If selectedBrandName exists, set brandNameQueryString and tmpViewingItem
-                        brandNameQueryString = "&car-brand=" + this.selectedBrandName;
+                    let URLPath = '/cars-data?num-cars=12&offset=' + offset;
+                    
+                    if(this.searchTerm !== ""){
+                        // If only searchTerm exists, set searchQueryString and tmpViewingItem
+                        let searchQueryString = "&search-term=" + this.searchTerm;
+                        tmpViewingItem = "'" + this.searchTerm + "' Cars";
+                        URLPath += searchQueryString;
+                    } else if(this.selectedBrandName !== "" && this.selectedModelInBrand !== ""){
+                        // If both selectedBrandName and selectedModelInBrand exist, set brandNameQueryString, modelNameQueryString and tmpViewingItem
+                        let brandNameQueryString = "&car-brand=" + this.selectedBrandName;
+                        let modelNameQueryString = "&car-model=" + this.selectedModelInBrand;
+                        tmpViewingItem = "Car Brand: " + this.selectedBrandName + " & Car Model: " + this.selectedModelInBrand;
+                        URLPath += brandNameQueryString + modelNameQueryString;
+                        console.log("should be here");
+                    } else if (this.selectedBrandName !== "" && this.selectedModelInBrand === ""){
+                        // If only selectedBrandName exists, set brandNameQueryString and tmpViewingItem
+                        let brandNameQueryString = "&car-brand=" + this.selectedBrandName;
                         tmpViewingItem = "Car Brand: " + this.selectedBrandName;
+                        URLPath += brandNameQueryString;
                     }
-                    axios.get('/cars-data?num-cars=12&offset=' + offset + brandNameQueryString) // Send GET request to cars-data path with query strings
+
+                    axios.get(URLPath) // Send GET request to cars-data path with query strings
                         .then((response)=>{// Request successful
                             // Set both carsData, numberOfPages, and viewingItem based on data returned in respone.
                             localApp.setCarsData(response.data.carsData);
@@ -247,13 +301,63 @@
                 showBrandCars(brandName){
                     // Set selected brand name
                     this.setSelectedBrandName(brandName);
+                    // Remove selectedModelInBrand to avoid selectedBrandName that doesn't match selectedModelInBrand
+                    this.selectedModelInBrand = "";
                     // Load cars data
                     this.loadCarsData(0);
                     console.log(brandName);
+                },
+                onDateSelected(daterange){
+                    // Set selected date
+                    this.selectedDate = daterange
+                    // Calculate number of days within selected daterange
+                    const startDate = new Date(daterange.start);
+                    const endDate = new Date(daterange.end);
+                    const NumberOfDaysBetweenDateRange = (endDate - startDate) / (1000 * 3600 * 24);
+                    // Set selected days
+                    this.setSelectedDays(NumberOfDaysBetweenDateRange);
+                },
+                setSelectedDays(selectedDays){
+                    this.selectedDays = selectedDays;
+                },
+                showModelCarsInBrand(){
+                    this.loadCarModelsInBrand(this.selectedBrandName);
+                    // Load cars data
+                    this.loadCarsData(0);
+                },
+                loadCarModelsInBrand(brandName){
+                    // Get data for car models in a given brand name from the web service using Axios.
+                    const localApp = this;
+                    axios.get('/car-models-in-brand?car-brand=' + brandName) // Send GET request to "car-models-in-brand" path
+                        .then((response)=>{// Request successful
+                            // Set modelsInBrand based on data returned in respone.
+                            localApp.setModelsInBrand(response.data);
+                            console.log("carModelsInBrand: " + JSON.stringify(response.data));
+                        })
+                        .catch((error)=>{
+                            // Handle error
+                            console.log(error);
+                        });
+                },
+                setModelsInBrand(modelsInBrand){
+                    this.modelsInBrand = modelsInBrand;
+                },
+                showCarsInSelectedBrandAndModel(){
+                    if(!this.selectedBrandName || !this.selectedModelInBrand){ 
+                        console.log("Please select both a car brand and model name.");
+                        this.showErrorModal = true;
+                    } else {
+                        // Load cars in selected brand and model
+                        this.loadCarsData(0);
+                    }
+                },
+                searchCarsInBrandOrModel(){
+                    // Load cars in searchTerm
+                    this.loadCarsData(0);
                 }
+                
             },
             computed: {
-                
             },
             created() { // Vue lifecycle hook, called when data is loaded.
                 // Load cars data from web service with offset=0
