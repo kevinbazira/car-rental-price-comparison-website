@@ -7,7 +7,6 @@
     <title>Car Rental Price Comparison</title>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"> 
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/vue-ctk-date-time-picker@1.4.1/dist/vue-ctk-date-time-picker.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
@@ -226,8 +225,8 @@
                         let searchQueryString = "&search-term=" + this.searchTerm;
                         tmpViewingItem = "'" + this.searchTerm + "' Cars";
                         URLPath += searchQueryString;
-                    } else if(this.selectedBrandName !== "" && this.selectedModelInBrand !== ""){
-                        // If both selectedBrandName and selectedModelInBrand exist, set brandNameQueryString, modelNameQueryString and tmpViewingItem
+                    } else if(this.selectedBrandName !== "" && this.selectedModelInBrand !== "" && this.selectedBrandName !== "All Brands" && this.selectedModelInBrand !== "All Models"){
+                        // If both selectedBrandName and selectedModelInBrand exist and are not equal to 'All Brands' or 'All Models', set brandNameQueryString, modelNameQueryString and tmpViewingItem
                         let brandNameQueryString = "&car-brand=" + this.selectedBrandName;
                         let modelNameQueryString = "&car-model=" + this.selectedModelInBrand;
                         tmpViewingItem = "Car Brand: " + this.selectedBrandName + " & Car Model: " + this.selectedModelInBrand;
