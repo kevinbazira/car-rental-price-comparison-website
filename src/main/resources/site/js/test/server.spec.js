@@ -1,10 +1,9 @@
 // Import node modules
-const assert = require("assert");
 const expect  = require("chai").expect;
 const request = require("request");
 const server = require("../server");
 
-// test REST API endpoints
+// Test REST API endpoints
 describe("TEST REST API ENDPOINTS", () => {
     describe("GET /cars-data", () => {
         it("should respond with JSON object containing all cars data", (done) => {

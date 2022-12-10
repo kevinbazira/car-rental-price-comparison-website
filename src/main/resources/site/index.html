@@ -231,7 +231,6 @@
                         let modelNameQueryString = "&car-model=" + this.selectedModelInBrand;
                         tmpViewingItem = "Car Brand: " + this.selectedBrandName + " & Car Model: " + this.selectedModelInBrand;
                         URLPath += brandNameQueryString + modelNameQueryString;
-                        console.log("should be here");
                     } else if (this.selectedBrandName !== "" && this.selectedModelInBrand === ""){
                         // If only selectedBrandName exists, set brandNameQueryString and tmpViewingItem
                         let brandNameQueryString = "&car-brand=" + this.selectedBrandName;
@@ -245,8 +244,6 @@
                             localApp.setCarsData(response.data.carsData);
                             localApp.setNumberOfPages(response.data.totalNumCars);
                             localApp.setViewingItem(tmpViewingItem);
-                            console.log("totalNumCars: " + JSON.stringify(response.data.totalNumCars));
-                            console.log("carsData: " + JSON.stringify(response.data.carsData));
                         })
                         .catch((error)=>{
                             // Handle error
@@ -284,7 +281,6 @@
                         .then((response)=>{// Request successful
                             // Set carBrands based on data returned in respone.
                             localApp.setCarBrands(response.data);
-                            console.log("carBrands: " + JSON.stringify(response.data));
                         })
                         .catch((error)=>{
                             // Handle error
@@ -305,7 +301,6 @@
                     this.searchTerm = "";
                     // Load cars data
                     this.loadCarsData(0);
-                    console.log(brandName);
                 },
                 onDateSelected(daterange){
                     // Set selected date
@@ -332,7 +327,6 @@
                         .then((response)=>{// Request successful
                             // Set modelsInBrand based on data returned in respone.
                             localApp.setModelsInBrand(response.data);
-                            console.log("carModelsInBrand: " + JSON.stringify(response.data));
                         })
                         .catch((error)=>{
                             // Handle error
@@ -344,7 +338,7 @@
                 },
                 showCarsInSelectedBrandAndModel(){
                     if(!this.selectedBrandName || !this.selectedModelInBrand){ 
-                        console.log("Please select both a car brand and model name.");
+                        // show error modal with message: Please select both a car brand and model name.
                         this.showErrorModal = true;
                     } else {
                         // Load cars in selected brand and model
