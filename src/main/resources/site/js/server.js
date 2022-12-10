@@ -1,15 +1,15 @@
 // Import the express and url modules
-const express = require('express');
+const express = require("express");
 const url = require("url");
 
 // Status codes defined in external file
-require('./http_status.js');
+require("./http_status.js");
 
 // The express module is a function. When it is executed it returns an app object
 const app = express();
 
 // Import the mysql module
-const mysql = require('mysql');
+const mysql = require("mysql");
 
 // Create a connection object with the user details
 const connectionPool = mysql.createPool({
@@ -22,7 +22,7 @@ const connectionPool = mysql.createPool({
 });
 
 // Serve up static pages from site root directory
-app.use(express.static('../'));
+app.use(express.static("../"));
 
 // Start the app listening on port 8080
 app.listen(8080);
@@ -40,12 +40,12 @@ const handleGetRequest = (request, response) => {
     const queries = urlObj.query;
 
     // Get the pagination properties if they have been set. Will be undefined if not set.
-    const name = queries['name'];
-    const carBrand = queries['car-brand'];
-    const carModel = queries['car-model'];
-    const searchTerm = queries['search-term'];
-    const numCars = queries['num-cars'];
-    const offset = queries['offset'];
+    const name = queries["name"];
+    const carBrand = queries["car-brand"];
+    const carModel = queries["car-model"];
+    const searchTerm = queries["search-term"];
+    const numCars = queries["num-cars"];
+    const offset = queries["offset"];
 
     // Split the path of the request into its components
     const pathArray = urlObj.pathname.split("/");
@@ -54,19 +54,19 @@ const handleGetRequest = (request, response) => {
     const pathEnd = pathArray[pathArray.length - 1];
 
     // If path ends with 'cars-data' we return all cars
-    if(pathEnd === 'cars-data'){
+    if(pathEnd === "cars-data"){
         getCarsDataWithTotalCount(response,  carBrand, carModel, searchTerm, numCars, offset);
         return;
     }
 
     // If path ends with 'car-brands' we return all car brands
-    if(pathEnd === 'car-brands'){
+    if(pathEnd === "car-brands"){
         getCarBrands(response);
         return;
     }
 
     // If path ends with 'car-models-in-brand' we return all cars in models of a specified brand name
-    if(pathEnd === 'car-models-in-brand'){
+    if(pathEnd === "car-models-in-brand"){
         if(!carBrand){  
             // return error message if car brand name is not specified
             response.send("{error: 'Setting car-brand query string is required to get cars in models of a specified brand'}");
@@ -82,9 +82,9 @@ const handleGetRequest = (request, response) => {
 }
 
 // Set up the application to handle GET requests sent to the user path
-app.get('/cars-data', handleGetRequest);
-app.get('/car-brands', handleGetRequest);
-app.get('/car-models-in-brand', handleGetRequest);
+app.get("/cars-data", handleGetRequest);
+app.get("/car-brands", handleGetRequest);
+app.get("/car-models-in-brand", handleGetRequest);
 
 
 /** 
@@ -120,7 +120,7 @@ const getCarsData = (response, carBrand, carModel, searchTerm, totalNumCars, num
         if (err){
             // Not an ideal error code, but we don't know what has gone wrong.
             response.status(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-            response.json({'error': true, 'message': + err});
+            response.json({"error": true, "message": + err});
             return;
         }
 
@@ -164,7 +164,7 @@ const getCarsDataWithTotalCount = (response, carBrand, carModel, searchTerm, num
         if (err){
             // Not an ideal error code, but we don't know what has gone wrong.
             response.status(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-            response.json({'error': true, 'message': + err});
+            response.json({"error": true, "message": + err});
             return;
         }
 
@@ -191,7 +191,7 @@ const getCarsDataWithTotalCount = (response, carBrand, carModel, searchTerm, num
         if (err){
             // Not an ideal error code, but we don't know what has gone wrong.
             response.status(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-            response.json({'error': true, 'message': + err});
+            response.json({"error": true, "message": + err});
             return;
         }
 
@@ -215,7 +215,7 @@ const getCarsDataWithTotalCount = (response, carBrand, carModel, searchTerm, num
         if (err){
             // Not an ideal error code, but we don't know what has gone wrong.
             response.status(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-            response.json({'error': true, 'message': + err});
+            response.json({"error": true, "message": + err});
             return;
         }
 
