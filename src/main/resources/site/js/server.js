@@ -87,17 +87,6 @@ const handleGetRequest = (request, response) => {
         return;
     }
 
-    // If path ends with 'car-brand-or-model' we return all cars of a specified brand or model name
-    if(pathEnd === 'car-brand-or-model'){
-        if(!name){  
-            // return error message if car brand or model name is not specified
-            response.send("{error: 'Setting name query string is required to get cars in a car brand or model'}");
-        } else {
-            getCarBrandOrModelDataWithTotalCount(response, name, numCars, offset);
-        }
-        return;
-    }
-
     //The path is not recognized. Return an error message
     response.status(HTTP_STATUS.NOT_FOUND);
     response.send("{error: 'Path not recognized', url: " + request.url + "}");
@@ -108,7 +97,6 @@ app.get('/cars-data', handleGetRequest);
 app.get('/car-brands', handleGetRequest);
 app.get('/car-models-in-brand', handleGetRequest);
 // app.get('/car-brand', handleGetRequest);
-app.get('/car-brand-or-model', handleGetRequest);
 
 
 /** 
@@ -120,7 +108,7 @@ const getCarsData = (response, carBrand, carModel, searchTerm, totalNumCars, num
     // Select the cars data using WHERE to convert foreign keys into useful data.
     let slqCarsData = "SELECT a.id, c.name AS car_brand_name, b.name AS car_model_name, b.image_url, a.rent_per_day, d.name AS rental_service, a.rent_url, a.date_scraped FROM cars_data_tbl AS a, car_model_tbl AS b, car_brand_tbl AS c, rental_services_tbl AS d WHERE a.car_model_id = b.id AND b.car_brand_id = c.id AND a.rental_service_id = d.id";
    
-    // Add car brand to SQL query if provided
+    // Add car brand, model and search term to SQL query if provided
     if(searchTerm !== undefined){
         // If searchTerm exists
         slqCarsData += " AND (c.name LIKE '%" + searchTerm + "%' OR b.name LIKE '%" + searchTerm + "%')";
@@ -167,7 +155,7 @@ const getCarsDataWithTotalCount = (response, carBrand, carModel, searchTerm, num
     let slqCarsData = "SELECT a.id, c.name AS car_brand_name, b.name AS car_model_name, b.image_url, a.rent_per_day, d.name AS rental_service, a.rent_url, a.date_scraped FROM cars_data_tbl AS a, car_model_tbl AS b, car_brand_tbl AS c, rental_services_tbl AS d WHERE a.car_model_id = b.id AND b.car_brand_id = c.id AND a.rental_service_id = d.id";
     let sqlCount = "SELECT COUNT(*) FROM ";
 
-    // Add car brand and model to SQL query if provided
+    // Add car brand, model and search term to SQL query if provided
     if(searchTerm !== undefined){
         // If searchTerm exists
         sqlCount += "(" + slqCarsData + " AND (c.name LIKE '%" + searchTerm + "%' OR b.name LIKE '%" + searchTerm + "%')) as cars_data";
@@ -311,67 +299,5 @@ const getCarBrandDataWithTotalCount = (response, name, numCars, offset) => {
     });
 }
 
-/** 
- * Returns all cars data of a specified brand or model appended to total number of cars.
- * Possibly limit on the total number of cars returned and the offset (for pagination). 
- * This function should be called in the callback of getCarBrandDataWithTotalCount. 
- */
- const getCarBrandOrModelData = (response, name, totalNumCars, numCars, offset) => {
-    // Select the cars data using JOIN to convert foreign keys into useful data.
-    let sql = "SELECT `id`, `car_model_id`, `rent_per_day`, `rental_service_id`, `rent_url`, `date_scraped` FROM `cars_data_tbl` WHERE `car_model_id` IN (SELECT `id` FROM `car_model_tbl` WHERE `car_brand_id` = (SELECT `id` FROM `car_brand_tbl` WHERE `name` = '" + name + "'))";
-
-    
-    // Limit the number of results returned, if this has been specified in the query string
-    if(numCars !== undefined && offset !== undefined ){
-        sql += " LIMIT " + numCars + " OFFSET " + offset;
-    }
-
-    // Execute the query
-    connectionPool.query(sql, (err, result) => {
-
-        // Check for errors
-        if (err){
-            // Not an ideal error code, but we don't know what has gone wrong.
-            response.status(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-            response.json({'error': true, 'message': + err});
-            return;
-        }
-
-        // Create JavaScript object that combines total number of items with data
-        const returnObj = {totalNumCars: totalNumCars};
-        returnObj.carsData = result; //Array of data from database
-
-        // Return results in JSON format
-        response.json(returnObj);
-    });
-}
-
-
-/** 
- * When retrieving all cars data in a specified brand we start by retrieving the total number of cars.
- * The database callback function will then call the function to get the cars data
- * with pagination.
- */
-const getCarBrandOrModelDataWithTotalCount = (response, name, numCars, offset) => {
-    let sql = "SELECT COUNT(*) FROM (SELECT `id`, `car_model_id`, `rent_per_day`, `rental_service_id`, `rent_url`, `date_scraped` FROM `cars_data_tbl` WHERE `car_model_id` IN (SELECT `id` FROM `car_model_tbl` WHERE `car_brand_id` = (SELECT `id` FROM `car_brand_tbl` WHERE `name` = '" + name + "'))) AS count_tbl";
-
-    // Execute the query and call the anonymous callback function.
-    connectionPool.query(sql, (err, result) => {
-
-        // Check for errors
-        if (err){
-            // Not an ideal error code, but we don't know what has gone wrong.
-            response.status(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-            response.json({'error': true, 'message': + err});
-            return;
-        }
-
-        // Get the total number of items from the result
-        const totalNumCars = result[0]['COUNT(*)'];
-        
-        // Call the function that retrieves all cars of a specified brand name
-        getCarBrandOrModelData(response, name, totalNumCars, numCars, offset);
-    });
-}
 
 
