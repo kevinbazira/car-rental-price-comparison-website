@@ -1,5 +1,6 @@
 // Import the express and url modules
 const express = require("express");
+const sanitizer = require("string-sanitizer");
 const url = require("url");
 
 // Status codes defined in external file
@@ -28,6 +29,17 @@ app.use(express.static("../"));
 app.listen(8080);
 
 
+/**
+ * Sanitize query string to avoid SQL injection.
+ */
+const sanitizeQueryString = (queryString) => {
+    if (queryString !== undefined) {
+        queryString = sanitizer.sanitize.keepSpace(queryString);
+    }
+    return queryString;
+}
+
+
 /** 
  * Handles GET requests sent to web service. 
  * Processes path and query string and calls appropriate functions to return the data.
@@ -39,13 +51,12 @@ const handleGetRequest = (request, response) => {
     // Extract object containing queries from URL object.
     const queries = urlObj.query;
 
-    // Get the pagination properties if they have been set. Will be undefined if not set.
-    const name = queries["name"];
-    const carBrand = queries["car-brand"];
-    const carModel = queries["car-model"];
-    const searchTerm = queries["search-term"];
-    const numCars = queries["num-cars"];
-    const offset = queries["offset"];
+    // Get query strings if they have been set. Sanitize them to avoid SQL injection.
+    const carBrand = sanitizeQueryString(queries["car-brand"]);
+    const carModel = sanitizeQueryString(queries["car-model"]);
+    const searchTerm = sanitizeQueryString(queries["search-term"]);
+    const numCars = sanitizeQueryString(queries["num-cars"]);
+    const offset = sanitizeQueryString(queries["offset"]);
 
     // Split the path of the request into its components
     const pathArray = urlObj.pathname.split("/");

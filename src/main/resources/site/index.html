@@ -221,7 +221,7 @@
                     let URLPath = '/cars-data?num-cars=12&offset=' + offset;
                     
                     if(this.searchTerm !== ""){
-                        // If only searchTerm exists, set searchQueryString and tmpViewingItem
+                        // If searchTerm exists, set searchQueryString and tmpViewingItem
                         let searchQueryString = "&search-term=" + this.searchTerm;
                         tmpViewingItem = "'" + this.searchTerm + "' Cars";
                         URLPath += searchQueryString;
