@@ -10,6 +10,7 @@ import java.util.Map;
 
 /**
  * Represents a web scraper.
+ * Uses jsoup to scrape car hire details from a given website.
  * @author Kevin Bazira
  * @version 1.0
  * @since 1.0
