@@ -7,6 +7,8 @@ import java.util.Map;
 
 /**
  * Represents website configurations for web elements to be scraped.
+ * Uses Spring for dependency injection; this is where the properties
+ * of the 5 websites that this program scrapes are configured.
  * @author Kevin Bazira
  * @version 1.0
  * @since 1.0

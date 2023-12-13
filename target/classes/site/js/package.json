@@ -1,0 +1,22 @@
+{
+  "name": "ug.kevinbazira.carrentalpricecomparison",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha",
+    "start": "node server.js"
+  },
+  "author": "Kevin Bazira",
+  "license": "MIT",
+  "description": "Car Rental Price Comparison Website",
+  "dependencies": {
+    "chai": "^4.3.7",
+    "express": "^4.18.2",
+    "mocha": "^10.1.0",
+    "mysql": "^2.18.1",
+    "request": "^2.88.2",
+    "string-sanitizer": "^2.0.2",
+    "supertest": "^6.3.3",
+    "url": "^0.11.0"
+  }
+}

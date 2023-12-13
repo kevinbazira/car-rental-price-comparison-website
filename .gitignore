@@ -1,2 +1,3 @@
 # Node dependency directories
 src/main/resources/site/js/node_modules
+target/classes/site/js/node_modules
